@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Role {
@@ -20,41 +20,35 @@ export interface User {
   providedIn: 'root'
 })
 export class RolesService {
-  private apiUrl = 'http://localhost:3000/roles'; // бекенд Nest.js
+  private apiUrl = 'http://localhost:3000/roles';
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Отримати всіх користувачів для управління їх ролями
-   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token'); // або отримати з AuthService
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+  }
+
+  /** Отримати всіх користувачів */
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/users/all`);
+    return this.http.get<User[]>(`${this.apiUrl}/users/all`, {
+      headers: this.getAuthHeaders()
+    });
   }
 
-  /**
-   * Оновити роль користувача
-   */
+  /** Оновити роль користувача */
   updateUserRole(userId: number, roleId: number): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/users/${userId}`, { roleId });
+    return this.http.patch<User>(`${this.apiUrl}/users/${userId}/role`, { roleId }, {
+      headers: this.getAuthHeaders()
+    });
   }
 
-  getRoles(): Observable<Role[]> {
-    return this.http.get<Role[]>(this.apiUrl);
-  }
-
-  getRole(id: number): Observable<Role> {
-    return this.http.get<Role>(`${this.apiUrl}/${id}`);
-  }
-
-  createRole(role: Partial<Role>): Observable<Role> {
-    return this.http.post<Role>(this.apiUrl, role);
-  }
-
-  updateRole(id: number, role: Partial<Role>): Observable<Role> {
-    return this.http.put<Role>(`${this.apiUrl}/${id}`, role);
-  }
-
-  deleteRole(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  /** Видалити користувача */
+  deleteUser(userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/users/${userId}`, {
+      headers: this.getAuthHeaders()
+    });
   }
 }

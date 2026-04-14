@@ -1,0 +1,58 @@
+<div class="header">
+  <h1>Task Manager</h1>
+  <span>Welcome, admin {{ adminName }}</span>
+</div>
+
+<div class="roles">
+  <h2>Manage Roles</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.name }}</td>
+        <td>{{ getRoleName(user.roleId) }}</td>
+        <td>
+          <button (click)="editRole(user)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal for editing role -->
+<div *ngIf="showRoleModal" class="modal-overlay" (click)="cancel()"></div>
+<div *ngIf="showRoleModal" class="modal">
+  <div class="modal-content">
+    <h3>Edit {{ selectedUser?.name }} role</h3>
+    <div class="role-options">
+      <label class="radio-label">
+        <input 
+          type="radio" 
+          [(ngModel)]="selectedUser!.roleId" 
+          [value]="2"
+          name="role" 
+        />
+        User
+      </label>
+      <label class="radio-label">
+        <input 
+          type="radio" 
+          [(ngModel)]="selectedUser!.roleId" 
+          [value]="1"
+          name="role" 
+        />
+        Admin
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-save" (click)="saveRole()">Save</button>
+      <button class="btn-cancel" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>

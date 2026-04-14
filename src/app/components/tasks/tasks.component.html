@@ -1,0 +1,74 @@
+<div class="tasks-page">
+  <app-header
+    [userName]="currentUser?.name ?? 'User'"
+    [tasks]="tasks"
+    (logoutClick)="logout()"></app-header>
+
+  <main class="dashboard">
+    <h2>Task Dashboard</h2>
+
+    <div class="filters">
+      <div class="filter-item dropdown-filter">
+        <button type="button" class="filter-button" (click)="toggleStatusFilter()">Filter by status</button>
+        <ul *ngIf="showStatusFilter" class="filter-list">
+          <li (click)="filterByStatus('All')">All</li>
+          <li *ngFor="let status of statuses" (click)="filterByStatus(status)">{{ status }}</li>
+        </ul>
+      </div>
+
+      <div class="filter-item dropdown-filter">
+        <button type="button" class="filter-button" (click)="togglePriorityFilter()">Filter by priority</button>
+        <ul *ngIf="showPriorityFilter" class="filter-list">
+          <li (click)="filterByPriority('All')">All</li>
+          <li *ngFor="let priority of priorities" (click)="filterByPriority(priority)">{{ priority }}</li>
+        </ul>
+      </div>
+
+      <label class="category-filter">
+        <span>Category:</span>
+        <select [(ngModel)]="selectedCategory" (change)="filterByCategory()">
+          <option value="All">All</option>
+          <option *ngFor="let cat of categories" [value]="cat.name">{{ cat.name }}</option>
+        </select>
+      </label>
+
+      <button type="button" class="add-button" (click)="addTask()">+ Add Task</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Deadline</th>
+            <th>Category</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let task of filteredTasks">
+            <td>{{ task.title }}</td>
+            <td>{{ task.priority }}</td>
+            <td>{{ task.status }}</td>
+            <td>{{ task.deadline | date:'dd MMM yyyy' }}</td>
+            <td>{{ task.category?.name ?? 'Uncategorized' }}</td>
+            <td class="menu-cell">
+              <div class="menu">
+                <button type="button" class="menu-trigger" (click)="toggleTaskMenu(task.id)">&#8942;</button>
+                <ul *ngIf="openTaskMenuId === task.id" class="menu-list">
+                  <li (click)="editTask(task)">Edit</li>
+                  <li (click)="deleteTask(task)">Delete</li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!filteredTasks.length">
+            <td colspan="6" class="empty-state">No tasks found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>

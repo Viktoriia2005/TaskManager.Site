@@ -1,0 +1,51 @@
+<div class="auth-container" [ngClass]="{ 'register-mode': isRegister }">
+  <div class="auth-box">
+    <h2 *ngIf="!isRegister">Authorization</h2>
+    <h2 *ngIf="isRegister">Registration</h2>
+
+    <form *ngIf="!isRegister" (ngSubmit)="login()">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="loginData.email" name="loginEmail" required email />
+
+      <label>Password</label>
+      <input type="password" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" />
+
+      <p *ngIf="loginError" class="form-error">{{ loginError }}</p>
+
+      <button type="submit">Log in</button>
+      <p class="switch">Don't have an account?
+        <a (click)="toggleMode()">Register here</a>
+      </p>
+    </form>
+
+    <form *ngIf="isRegister" (ngSubmit)="register()">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="registerData.name" name="registerName" required />
+
+      <label>Email</label>
+      <input
+        type="email"
+        [(ngModel)]="registerData.email"
+        name="registerEmail"
+        required
+        email
+        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" />
+
+      <label>Password</label>
+      <input
+        type="password"
+        [(ngModel)]="registerData.password"
+        name="registerPassword"
+        required
+        minlength="6"
+        pattern=".*[A-Za-z].*" />
+
+      <p *ngIf="registerError" class="form-error">{{ registerError }}</p>
+
+      <button type="submit">Sign up</button>
+      <p class="switch">Already have an account?
+        <a (click)="toggleMode()">Login here</a>
+      </p>
+    </form>
+  </div>
+</div>

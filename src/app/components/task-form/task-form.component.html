@@ -1,0 +1,51 @@
+<div class="task-form-page">
+  <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="headerTasks" (logoutClick)="logout()"></app-header>
+
+  <section class="task-form-shell">
+    <h2>{{ taskId ? 'Edit Task' : 'Add Task' }}</h2>
+
+    <form class="task-form" (ngSubmit)="saveTask()">
+      <div class="field full">
+        <label for="title">Title:</label>
+        <input id="title" [(ngModel)]="task.title" name="title" required />
+      </div>
+
+      <div class="field full">
+        <label for="description">Description:</label>
+        <textarea id="description" [(ngModel)]="task.description" name="description"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="priority">Priority:</label>
+        <select id="priority" [(ngModel)]="task.priority" name="priority">
+          <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="status">Status:</label>
+        <select id="status" [(ngModel)]="task.status" name="status">
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="deadline">Due Date:</label>
+        <input id="deadline" type="date" [(ngModel)]="task.deadline" name="deadline" />
+      </div>
+
+      <div class="field">
+        <label for="categoryId">Category:</label>
+        <select id="categoryId" [(ngModel)]="task.categoryId" name="categoryId">
+          <option [ngValue]="null">Select category</option>
+          <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <div class="actions full">
+        <button type="submit" class="save-btn">Save</button>
+        <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  </section>
+</div>

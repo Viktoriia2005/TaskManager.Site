@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
+
+.task-form-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c7f8cf 0%, #b6f3d5 100%);
+  font-family: 'Martel Sans', sans-serif;
+}
+
+.task-form-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+h2 {
+  margin: 0 0 28px;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.task-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+  padding: 28px;
+  background: #fff;
+  border-radius: 12px;
+  font-family: 'Martel Sans', sans-serif;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-weight: 700;
+}
+
+input,
+textarea,
+select {
+  padding: 8px 10px;
+  border: 1px solid #8ca0ab;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 14px;
+}
+
+.save-btn,
+.cancel-btn {
+  min-width: 110px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.save-btn {
+  border: none;
+  background: #2f5875;
+  color: #fff;
+}
+
+.cancel-btn {
+  border: 2px solid #59c6b2;
+  background: #a9f0df;
+  color: #102f3e;
+}
+
+@media (max-width: 900px) {
+  .task-form {
+    grid-template-columns: 1fr;
+    padding: 28px;
+  }
+}

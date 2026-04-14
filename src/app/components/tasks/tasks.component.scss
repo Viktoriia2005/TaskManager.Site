@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
+
+.tasks-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c7f8cf 0%, #b6f3d5 100%);
+}
+
+.dashboard {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  font-family: 'Martel Sans', sans-serif;
+}
+
+h2 {
+  margin: 0 0 24px;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.filter-item,
+.category-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-button,
+.add-button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-button {
+  background: #59c6b2;
+  color: #102f3e;
+  font-weight: 700;
+}
+
+select {
+  min-width: 130px;
+  padding: 8px 10px;
+  border: 1px solid #46535b;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.filter-list,
+.menu-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 170px;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  z-index: 12;
+}
+
+.filter-list li,
+.menu-list li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.filter-list li:hover,
+.menu-list li:hover {
+  background: #eef8f5;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+th,
+td {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+thead {
+  background: #e8e2e2;
+}
+
+tbody tr {
+  border-bottom: 1px solid rgba(47, 88, 117, 0.12);
+}
+
+.menu-cell {
+  width: 64px;
+}
+
+.menu {
+  position: relative;
+}
+
+.menu-trigger {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.menu .menu-list {
+  left: auto;
+  right: 0;
+}
+
+.empty-state {
+  text-align: center;
+  color: #4c5f68;
+}
+
+@media (max-width: 900px) {
+  .dashboard {
+    padding: 40px 20px 60px;
+  }
+
+  .filters {
+    align-items: stretch;
+  }
+}

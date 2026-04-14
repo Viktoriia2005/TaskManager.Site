@@ -1,0 +1,29 @@
+<div class="header">
+  <h1>Task Manager</h1>
+  <span>Welcome, admin {{ adminName }}</span>
+</div>
+
+<div class="users">
+  <h2>Manage Users</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role?.name }}</td>
+        <td>
+          <button class="btn-delete" (click)="deleteUser(user.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

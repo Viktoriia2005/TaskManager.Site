@@ -5,31 +5,31 @@ import { AuthService } from '../services/auth.service';
 export const roleAdminGuard = (route: any, state: any) => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  
+
   const user = authService.getCurrentUser();
-  
-  // Check if user is admin (roleId 1 or role 'admin')
-  const isAdmin = user && (user.roleId === 1 || user.role === 'admin');
-  
+
+  // Перевірка: чи користувач має roleId === 1 (адмін)
+  const isAdmin = user && user.roleId === 1;
+
   if (!isAdmin) {
     router.navigate(['/user/tasks']);
     return false;
   }
-  
+
   return true;
 };
 
 export const roleUserGuard = (route: any, state: any) => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  
+
   const user = authService.getCurrentUser();
-  
-  // Check if user exists
+
+  // Перевірка: чи користувач існує
   if (!user) {
     router.navigate(['/auth']);
     return false;
   }
-  
+
   return true;
 };

@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RolesService, User, Role } from '../../../services/roles.service';
+import { AuthService } from '../../../services/auth.service'; // додай AuthService
 
 @Component({
   selector: 'app-admin-roles',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-roles.component.html',
-  styleUrl: './admin-roles.component.scss'
+  styleUrls: ['./admin-roles.component.scss'] // виправлено styleUrl → styleUrls
 })
 export class AdminRolesComponent implements OnInit {
   users: User[] = [];
@@ -16,15 +17,19 @@ export class AdminRolesComponent implements OnInit {
     { id: 1, name: 'Admin' },
     { id: 2, name: 'User' }
   ];
-  
+
   showRoleModal = false;
   selectedUser: User | null = null;
-  adminName = 'admin';
+  adminName: string | null = null; // тепер динамічне значення
 
-  constructor(private rolesService: RolesService) { }
+  constructor(
+    private rolesService: RolesService,
+    private authService: AuthService // інжектуємо AuthService
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadAdminName();
   }
 
   loadUsers(): void {
@@ -36,6 +41,13 @@ export class AdminRolesComponent implements OnInit {
         console.error('Failed to load users:', err);
       }
     });
+  }
+
+  loadAdminName(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.adminName = currentUser.name; // підтягнути ім’я з таблиці users
+    }
   }
 
   editRole(user: User): void {

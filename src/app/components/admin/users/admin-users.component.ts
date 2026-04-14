@@ -1,19 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RolesService, User } from '../../../services/roles.service';
+import { UsersService } from '../../../services/users.service'; // додай UsersService
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './admin-users.component.html',
-  styleUrl: './admin-users.component.scss'
+  styleUrls: ['./admin-users.component.scss'] // виправлено styleUrl → styleUrls
 })
 export class AdminUsersComponent implements OnInit {
   users: User[] = [];
   adminName = 'admin';
 
-  constructor(private rolesService: RolesService) { }
+  constructor(
+    private rolesService: RolesService,
+    private usersService: UsersService // інжектимо UsersService
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -30,20 +34,11 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  deleteUser(userId: number): void {
-    if (confirm('Are you sure you want to delete this user?')) {
-      // TODO: Implement deleteUser method in UsersService
-      console.log('Delete user:', userId);
-    }
-  }
-}
-  }
-
   deleteUser(id: number): void {
     if (confirm('Are you sure you want to delete this user?')) {
       this.usersService.deleteUser(id).subscribe({
         next: () => {
-          this.users = this.users.filter(u => u.id !== id);
+          this.users = this.users.filter((u: User) => u.id !== id);
         },
         error: (err) => {
           console.error('Failed to delete user:', err);

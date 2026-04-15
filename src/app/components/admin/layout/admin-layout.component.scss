@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
 $dark-green: #099070;
 $mint: #88FFE3;
 $light-green: #BBFDD6;
@@ -8,19 +9,20 @@ $teal: #53B09B;
 .admin-container {
   display: flex;
   min-height: 100vh;
+  font-family: 'Martel Sans', sans-serif;
 }
 
 .sidebar {
   background: $blue-green;
   width: 80px;
-  padding: 2rem 0;
+  padding: 1rem 0;
   position: fixed;
   left: 0;
-  top: 0;
-  height: 100vh;
+  top: 60px; // відступ зверху, щоб не доходила до самого верху
+  height: calc(100vh - 60px); // висота з урахуванням відступу
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+  flex-direction: column;
+  justify-content: space-between;
 
   ul {
     list-style: none;
@@ -29,10 +31,10 @@ $teal: #53B09B;
     width: 100%;
 
     li {
-      padding: 1.5rem 0.5rem;
+      padding: 1rem 0.5rem;
       cursor: pointer;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: 1rem; // зменшений шрифт
       transition: background 0.3s, transform 0.2s;
       display: flex;
       align-items: center;
@@ -40,8 +42,21 @@ $teal: #53B09B;
 
       &:hover {
         background: $teal;
-        transform: scale(1.1);
+        transform: scale(1.05);
       }
+    }
+  }
+
+  .logout-btn {
+    padding: 1rem 0.5rem;
+    text-align: center;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 10px; // невеликий відступ від низу
+
+    &:hover {
+      background: $teal;
+      transform: scale(1.05);
     }
   }
 }

@@ -3,7 +3,7 @@ import { AuthComponent } from './components/auth/auth.component';
 import { AdminLayoutComponent } from './components/admin/layout/admin-layout.component';
 import { AdminRolesComponent } from './components/admin/roles/admin-roles.component';
 import { AdminCategoriesComponent } from './components/admin/categories/admin-categories.component';
-import { AdminUsersComponent } from './components/admin/users/admin-users.component';
+import { AdminTasksComponent } from './components/admin/tasks/admin-tasks.component'; // ← правильний імпорт
 import { UserTasksComponent } from './components/user/tasks/user-tasks.component';
 import { UserTaskFormComponent } from './components/user/task-form/user-task-form.component';
 import { authPageGuard, userPageGuard } from './guards/auth.guards';
@@ -20,7 +20,7 @@ export const routes: Routes = [
     component: AuthComponent,
     canActivate: [authPageGuard],
   },
-  
+
   // ===== ADMIN ROUTES =====
   {
     path: 'admin',
@@ -36,8 +36,8 @@ export const routes: Routes = [
         component: AdminCategoriesComponent,
       },
       {
-        path: 'users',
-        component: AdminUsersComponent,
+        path: 'tasks', // ← тепер правильний шлях
+        component: AdminTasksComponent, // ← правильний компонент
       },
       {
         path: '',
@@ -72,7 +72,7 @@ export const routes: Routes = [
     ],
   },
 
-  // Legacy routes for backward compatibility
+  // Legacy redirects (залишаємо тільки для user)
   {
     path: 'tasks',
     redirectTo: 'user/tasks',

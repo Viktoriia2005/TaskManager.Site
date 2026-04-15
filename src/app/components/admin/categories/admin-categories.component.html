@@ -6,7 +6,7 @@
 <div class="categories">
   <h2>Manage Categories</h2>
   <button class="btn-add" (click)="openAddModal()">+ Add</button>
-  
+
   <table>
     <thead>
       <tr>
@@ -19,7 +19,7 @@
         <td>{{ category.name }}</td>
         <td>
           <button class="btn-edit" (click)="editCategory(category)">Edit</button>
-          <button class="btn-delete" (click)="deleteCategory(category.id)">Delete</button>
+          <button class="btn-delete" (click)="deleteCategory(category.id!)">Delete</button>
         </td>
       </tr>
     </tbody>
@@ -31,24 +31,13 @@
 <div *ngIf="showCategoryModal" class="modal">
   <div class="modal-content">
     <h3>{{ isEditing ? 'Edit category' : 'Add new category' }}</h3>
-    
-    <div class="form-group">
-      <label>Name</label>
-      <input 
-        type="text" 
-        [(ngModel)]="selectedCategory!.name" 
-        placeholder="Category name"
-      />
-    </div>
 
     <div class="form-group">
-      <label>Description</label>
-      <textarea 
-        [(ngModel)]="selectedCategory!.description" 
-        placeholder="Category description"
-        rows="3"
-      ></textarea>
+      <label>Name</label>
+      <input type="text" [(ngModel)]="selectedCategory!.name" placeholder="Category name" />
     </div>
+
+    <!-- Description field removed -->
 
     <div class="modal-actions">
       <button class="btn-save" (click)="saveCategory()">Save</button>

@@ -1,13 +1,13 @@
 <div class="admin-container">
   <nav class="sidebar">
     <ul>
-      <li (click)="navigate('roles')">🔑 Roles</li>
+      <li (click)="navigate('roles')">👥 Roles</li>
       <li (click)="navigate('categories')">📂 Categories</li>
-      <li (click)="navigate('users')">👥 Users</li>
-      <li (click)="logout()">🚪 Logout</li>
+      <li (click)="navigate('tasks')">🔑 Tasks</li>
+      <li class="logout" (click)="logout()">🚪 Logout</li>
     </ul>
   </nav>
-  
+
   <div class="admin-content">
     <router-outlet></router-outlet>
   </div>

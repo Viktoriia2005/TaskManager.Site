@@ -2,25 +2,30 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoriesService, Category } from '../../../services/categories.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-categories',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-categories.component.html',
-  styleUrl: './admin-categories.component.scss'
+  styleUrls: ['./admin-categories.component.scss']
 })
 export class AdminCategoriesComponent implements OnInit {
   categories: Category[] = [];
   showCategoryModal = false;
-  selectedCategory: Category | null = null;
+  selectedCategory: Partial<Category> | null = null; // тепер Partial<Category>
   isEditing = false;
-  adminName = 'admin';
+  adminName: string | null = null;
 
-  constructor(private categoriesService: CategoriesService) { }
+  constructor(
+    private categoriesService: CategoriesService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.loadCategories();
+    this.loadAdminName();
   }
 
   loadCategories(): void {
@@ -34,8 +39,16 @@ export class AdminCategoriesComponent implements OnInit {
     });
   }
 
+  loadAdminName(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.adminName = currentUser.name;
+    }
+  }
+
   openAddModal(): void {
-    this.selectedCategory = { id: 0, name: '', description: '' };
+    // створюємо без id
+    this.selectedCategory = { name: '' };
     this.isEditing = false;
     this.showCategoryModal = true;
   }
@@ -47,12 +60,12 @@ export class AdminCategoriesComponent implements OnInit {
   }
 
   saveCategory(): void {
-    if (!this.selectedCategory || !this.selectedCategory.name.trim()) {
+    if (!this.selectedCategory || !this.selectedCategory.name?.trim()) {
       alert('Please enter a category name');
       return;
     }
 
-    if (this.isEditing && this.selectedCategory.id > 0) {
+    if (this.isEditing && this.selectedCategory.id) {
       this.categoriesService.updateCategory(this.selectedCategory.id, this.selectedCategory).subscribe({
         next: (updatedCategory) => {
           const index = this.categories.findIndex(c => c.id === updatedCategory.id);
@@ -66,7 +79,10 @@ export class AdminCategoriesComponent implements OnInit {
         }
       });
     } else {
-      this.categoriesService.createCategory(this.selectedCategory).subscribe({
+      this.categoriesService.createCategory({
+        name: this.selectedCategory.name!,
+        description: this.selectedCategory.description
+      }).subscribe({
         next: (newCategory) => {
           this.categories.push(newCategory);
           this.cancel();

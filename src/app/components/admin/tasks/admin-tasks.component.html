@@ -1,0 +1,27 @@
+<div class="header">
+  <h1>Task Manager</h1>
+  <span>Welcome, admin {{ adminName }}</span>
+</div>
+
+<div class="tasks">
+  <h2>Manage Tasks</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>User</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let task of tasks">
+        <td>{{ task.title }}</td>
+        <td>{{ task.priority }}</td>
+        <td>{{ task.status }}</td>
+        <td>{{ task.user?.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

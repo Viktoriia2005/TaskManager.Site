@@ -146,3 +146,54 @@ tbody tr {
     align-items: stretch;
   }
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  border: 2px solid #53B09B;
+
+  &.delete {
+    border-color: #c0392b;
+
+    .modal-content h3 {
+      color: #c0392b;
+      font-weight: 600;
+    }
+
+    .btn-save {
+      background: #c0392b;
+      color: #fff;
+
+      &:hover {
+        background: #e74c3c;
+      }
+    }
+
+    .btn-cancel {
+      background: #BBFDD6;
+      color: #2A516A;
+      border: 1px solid #0AAE87;
+
+      &:hover {
+        background: #88FFE3;
+      }
+    }
+  }
+}

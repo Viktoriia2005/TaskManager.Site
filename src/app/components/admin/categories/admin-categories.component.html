@@ -15,11 +15,11 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let category of categories">
+      <tr *ngFor="let category of categories" (dblclick)="editCategory(category)">
         <td>{{ category.name }}</td>
         <td>
           <button class="btn-edit" (click)="editCategory(category)">Edit</button>
-          <button class="btn-delete" (click)="deleteCategory(category.id!)">Delete</button>
+          <button class="btn-delete" (click)="confirmDelete(category)">Delete</button>
         </td>
       </tr>
     </tbody>
@@ -37,11 +37,21 @@
       <input type="text" [(ngModel)]="selectedCategory!.name" placeholder="Category name" />
     </div>
 
-    <!-- Description field removed -->
-
     <div class="modal-actions">
       <button class="btn-save" (click)="saveCategory()">Save</button>
       <button class="btn-cancel" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for deleting category -->
+<div *ngIf="showDeleteModal" class="modal-overlay" (click)="cancelDelete()"></div>
+<div *ngIf="showDeleteModal" class="modal delete">
+  <div class="modal-content">
+    <h3>Are you sure you want to delete this category {{ selectedCategory?.name }}?</h3>
+    <div class="modal-actions">
+      <button class="btn-save" (click)="deleteCategoryConfirmed()">Yes</button>
+      <button class="btn-cancel" (click)="cancelDelete()">No</button>
     </div>
   </div>
 </div>

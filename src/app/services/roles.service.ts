@@ -25,27 +25,34 @@ export class RolesService {
   constructor(private http: HttpClient) { }
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token'); // або отримати з AuthService
+    const token = localStorage.getItem('token'); // or get from AuthService
     return new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
   }
 
-  /** Отримати всіх користувачів */
+  /** Get all roles */
+  getRoles(): Observable<Role[]> {
+    return this.http.get<Role[]>(this.apiUrl, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  /** Get all users */
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/users/all`, {
       headers: this.getAuthHeaders()
     });
   }
 
-  /** Оновити роль користувача */
+  /** Update user role */
   updateUserRole(userId: number, roleId: number): Observable<User> {
     return this.http.patch<User>(`${this.apiUrl}/users/${userId}/role`, { roleId }, {
       headers: this.getAuthHeaders()
     });
   }
 
-  /** Видалити користувача */
+  /** Delete user */
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/users/${userId}`, {
       headers: this.getAuthHeaders()

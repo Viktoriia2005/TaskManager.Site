@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoriesService, Category } from '../../../services/categories.service';
@@ -12,10 +12,18 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./admin-categories.component.scss']
 })
 export class AdminCategoriesComponent implements OnInit {
+  // List of categories
   categories: Category[] = [];
+
+  // Modal states
   showCategoryModal = false;
-  selectedCategory: Partial<Category> | null = null; // тепер Partial<Category>
+  showDeleteModal = false;
+
+  // Selected category for editing/deleting
+  selectedCategory: Partial<Category> | null = null;
   isEditing = false;
+
+  // Current admin name
   adminName: string | null = null;
 
   constructor(
@@ -28,17 +36,15 @@ export class AdminCategoriesComponent implements OnInit {
     this.loadAdminName();
   }
 
+  // Load all categories
   loadCategories(): void {
     this.categoriesService.getCategories().subscribe({
-      next: (data) => {
-        this.categories = data;
-      },
-      error: (err) => {
-        console.error('Failed to load categories:', err);
-      }
+      next: (data) => this.categories = data,
+      error: (err) => console.error('Failed to load categories:', err)
     });
   }
 
+  // Load current admin name
   loadAdminName(): void {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
@@ -46,19 +52,21 @@ export class AdminCategoriesComponent implements OnInit {
     }
   }
 
+  // Open add modal
   openAddModal(): void {
-    // створюємо без id
     this.selectedCategory = { name: '' };
     this.isEditing = false;
     this.showCategoryModal = true;
   }
 
+  // Open edit modal (from button or double click)
   editCategory(category: Category): void {
     this.selectedCategory = { ...category };
     this.isEditing = true;
     this.showCategoryModal = true;
   }
 
+  // Save category (create or update)
   saveCategory(): void {
     if (!this.selectedCategory || !this.selectedCategory.name?.trim()) {
       alert('Please enter a category name');
@@ -74,9 +82,7 @@ export class AdminCategoriesComponent implements OnInit {
           }
           this.cancel();
         },
-        error: (err) => {
-          console.error('Failed to update category:', err);
-        }
+        error: (err) => console.error('Failed to update category:', err)
       });
     } else {
       this.categoriesService.createCategory({
@@ -87,29 +93,40 @@ export class AdminCategoriesComponent implements OnInit {
           this.categories.push(newCategory);
           this.cancel();
         },
-        error: (err) => {
-          console.error('Failed to create category:', err);
-        }
+        error: (err) => console.error('Failed to create category:', err)
       });
     }
   }
 
-  deleteCategory(id: number): void {
-    if (confirm('Are you sure you want to delete this category?')) {
-      this.categoriesService.deleteCategory(id).subscribe({
+  // Open delete confirmation modal
+  confirmDelete(category: Category): void {
+    this.selectedCategory = { ...category };
+    this.showDeleteModal = true;
+  }
+
+  // Delete category after confirmation
+  deleteCategoryConfirmed(): void {
+    if (this.selectedCategory?.id) {
+      this.categoriesService.deleteCategory(this.selectedCategory.id).subscribe({
         next: () => {
-          this.categories = this.categories.filter(c => c.id !== id);
+          this.categories = this.categories.filter(c => c.id !== this.selectedCategory!.id);
+          this.cancelDelete();
         },
-        error: (err) => {
-          console.error('Failed to delete category:', err);
-        }
+        error: (err) => console.error('Failed to delete category:', err)
       });
     }
   }
 
+  // Cancel edit modal
   cancel(): void {
     this.showCategoryModal = false;
     this.selectedCategory = null;
     this.isEditing = false;
+  }
+
+  // Cancel delete modal
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.selectedCategory = null;
   }
 }

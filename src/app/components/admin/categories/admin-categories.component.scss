@@ -219,3 +219,27 @@ $teal: #53B09B;
     }
   }
 }
+
+.modal.delete {
+  border: 2px solid #c0392b;
+
+  .modal-content {
+    h3 {
+      color: #c0392b;
+      font-weight: 600;
+    }
+
+    .modal-actions {
+      button {
+        &.btn-save {
+          background: #c0392b;
+          color: white;
+
+          &:hover {
+            background: #e74c3c;
+          }
+        }
+      }
+    }
+  }
+}

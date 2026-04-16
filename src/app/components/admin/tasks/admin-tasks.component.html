@@ -9,14 +9,20 @@
   <table>
     <thead>
       <tr>
-        <th>Title</th>
-        <th>Priority</th>
-        <th>Status</th>
-        <th>User</th>
+        <th (click)="sortTasks('title')">Title {{ getSortArrow('title') }}</th>
+        <th>
+          Priority
+          <button class="menu-btn" (click)="toggleFilterMenu('priority', $event)">⋮</button>
+        </th>
+        <th>
+          Status
+          <button class="menu-btn" (click)="toggleFilterMenu('status', $event)">⋮</button>
+        </th>
+        <th (click)="sortTasks('user')">User {{ getSortArrow('user') }}</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let task of tasks">
+      <tr *ngFor="let task of filteredTasks">
         <td>{{ task.title }}</td>
         <td>{{ task.priority }}</td>
         <td>{{ task.status }}</td>
@@ -25,3 +31,12 @@
     </tbody>
   </table>
 </div>
+
+<!-- Filter dropdown menu -->
+<ul *ngIf="activeFilter" class="dropdown-menu" [style.top.px]="filterMenuPosition.top"
+  [style.left.px]="filterMenuPosition.left">
+  <li *ngFor="let option of getFilterOptions(activeFilter)" (click)="applyFilter(activeFilter, option)">
+    {{ option }}
+  </li>
+  <li (click)="applyFilter(activeFilter, null)">Show all</li>
+</ul>

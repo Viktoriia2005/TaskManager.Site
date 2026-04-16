@@ -19,14 +19,21 @@ export class TasksComponent implements OnInit {
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
   categories: Category[] = [];
+
   statuses = ['new', 'in progress', 'done'];
-  priorities = ['Low', 'Medium', 'High'];
+  priorities = ['low', 'medium', 'high'];
+
   selectedCategory = 'All';
   selectedStatus = 'All';
   selectedPriority = 'All';
+
   showStatusFilter = false;
   showPriorityFilter = false;
   openTaskMenuId: number | null = null;
+
+  // Modal state for delete confirmation
+  showDeleteModal = false;
+  selectedTask: Task | null = null;
 
   constructor(
     private authService: AuthService,
@@ -43,7 +50,6 @@ export class TasksComponent implements OnInit {
 
   loadTasks(): void {
     const userId = this.currentUser?.id;
-
     this.tasksService.getTasks(userId).subscribe((tasks) => {
       this.tasks = tasks;
       this.applyFilters();
@@ -94,12 +100,27 @@ export class TasksComponent implements OnInit {
     this.router.navigate(['/tasks', task.id, 'edit']);
   }
 
-  deleteTask(task: Task): void {
-    if (confirm(`Are you sure you want to delete this ${task.title} task?`)) {
-      this.tasksService.deleteTask(task.id).subscribe(() => {
+  // Open delete confirmation modal
+  confirmDelete(task: Task): void {
+    this.selectedTask = task;
+    this.showDeleteModal = true;
+    this.openTaskMenuId = null;
+  }
+
+  // Delete task after confirmation
+  deleteTaskConfirmed(): void {
+    if (this.selectedTask) {
+      this.tasksService.deleteTask(this.selectedTask.id).subscribe(() => {
         this.loadTasks();
+        this.cancelDelete();
       });
     }
+  }
+
+  // Cancel delete modal
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.selectedTask = null;
   }
 
   toggleTaskMenu(taskId: number): void {

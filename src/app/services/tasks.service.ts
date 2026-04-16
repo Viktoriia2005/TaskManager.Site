@@ -31,11 +31,12 @@ export interface TaskPayload {
   title: string;
   description?: string;
   priority: string;
-  deadline: string;
   status: string;
+  deadline: Date;     // ✅ matches backend DTO
   userId: number;
   categoryId?: number | null;
 }
+
 
 @Injectable({
   providedIn: 'root'

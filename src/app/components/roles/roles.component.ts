@@ -15,7 +15,7 @@ export class RolesComponent implements OnInit {
   constructor(private rolesService: RolesService) { }
 
   ngOnInit(): void {
-    this.rolesService.getRoles().subscribe(data => {
+    this.rolesService.getRoles().subscribe((data: Role[]) => {
       this.roles = data;
     });
   }

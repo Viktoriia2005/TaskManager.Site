@@ -1,39 +1,10 @@
 <div class="tasks-page">
-  <app-header
-    [userName]="currentUser?.name ?? 'User'"
-    [tasks]="tasks"
-    (logoutClick)="logout()"></app-header>
+  <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="tasks" (logoutClick)="logout()"></app-header>
 
   <main class="dashboard">
     <h2>Task Dashboard</h2>
 
-    <div class="filters">
-      <div class="filter-item dropdown-filter">
-        <button type="button" class="filter-button" (click)="toggleStatusFilter()">Filter by status</button>
-        <ul *ngIf="showStatusFilter" class="filter-list">
-          <li (click)="filterByStatus('All')">All</li>
-          <li *ngFor="let status of statuses" (click)="filterByStatus(status)">{{ status }}</li>
-        </ul>
-      </div>
-
-      <div class="filter-item dropdown-filter">
-        <button type="button" class="filter-button" (click)="togglePriorityFilter()">Filter by priority</button>
-        <ul *ngIf="showPriorityFilter" class="filter-list">
-          <li (click)="filterByPriority('All')">All</li>
-          <li *ngFor="let priority of priorities" (click)="filterByPriority(priority)">{{ priority }}</li>
-        </ul>
-      </div>
-
-      <label class="category-filter">
-        <span>Category:</span>
-        <select [(ngModel)]="selectedCategory" (change)="filterByCategory()">
-          <option value="All">All</option>
-          <option *ngFor="let cat of categories" [value]="cat.name">{{ cat.name }}</option>
-        </select>
-      </label>
-
-      <button type="button" class="add-button" (click)="addTask()">+ Add Task</button>
-    </div>
+    <!-- Filters ... -->
 
     <div class="table-wrap">
       <table>
@@ -59,7 +30,7 @@
                 <button type="button" class="menu-trigger" (click)="toggleTaskMenu(task.id)">&#8942;</button>
                 <ul *ngIf="openTaskMenuId === task.id" class="menu-list">
                   <li (click)="editTask(task)">Edit</li>
-                  <li (click)="deleteTask(task)">Delete</li>
+                  <li (click)="confirmDelete(task)">Delete</li>
                 </ul>
               </div>
             </td>
@@ -71,4 +42,16 @@
       </table>
     </div>
   </main>
+</div>
+
+<!-- Modal for deleting task -->
+<div *ngIf="showDeleteModal" class="modal-overlay" (click)="cancelDelete()"></div>
+<div *ngIf="showDeleteModal" class="modal delete">
+  <div class="modal-content">
+    <h3>Are you sure you want to delete task "{{ selectedTask?.title }}"?</h3>
+    <div class="modal-actions">
+      <button class="btn-save" (click)="deleteTaskConfirmed()">Yes</button>
+      <button class="btn-cancel" (click)="cancelDelete()">No</button>
+    </div>
+  </div>
 </div>

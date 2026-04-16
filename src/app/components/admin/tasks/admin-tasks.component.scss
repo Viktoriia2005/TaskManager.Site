@@ -177,3 +177,38 @@ $teal: #53B09B;
     }
   }
 }
+
+/* Styles for filter/context menus */
+.menu-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.dropdown-menu {
+  position: absolute;
+  min-width: 140px;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 3000;
+  /* higher than table */
+  font-family: 'Martel Sans', sans-serif;
+}
+
+.dropdown-menu li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.dropdown-menu li:hover {
+  background: #eef8f5;
+}

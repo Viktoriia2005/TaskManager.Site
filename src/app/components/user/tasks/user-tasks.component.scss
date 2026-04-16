@@ -15,76 +15,31 @@
 h2 {
   margin: 0 0 24px;
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #102f3e;
 }
 
 .filters {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  justify-content: flex-end;
   margin-bottom: 18px;
 }
 
-.filter-item,
-.category-filter {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.filter-button,
 .add-button {
-  padding: 8px 14px;
+  padding: 10px 18px;
   border: none;
   border-radius: 14px;
-  background: transparent;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.add-button {
   background: #59c6b2;
   color: #102f3e;
+  font-size: 1rem;
   font-weight: 700;
-}
-
-select {
-  min-width: 130px;
-  padding: 8px 10px;
-  border: 1px solid #46535b;
-  background: #fff;
-  font: inherit;
-  font-size: 0.9rem;
-}
-
-.filter-list,
-.menu-list {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 170px;
-  margin: 0;
-  padding: 8px 0;
-  list-style: none;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-  z-index: 12;
-}
-
-.filter-list li,
-.menu-list li {
-  padding: 8px 12px;
   cursor: pointer;
-  font-size: 0.9rem;
+  transition: background 0.2s ease;
 }
 
-.filter-list li:hover,
-.menu-list li:hover {
-  background: #eef8f5;
+.add-button:hover {
+  background: #48b0a0;
 }
 
 .table-wrap {
@@ -94,47 +49,46 @@ select {
 table {
   width: 100%;
   border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.7);
+  background: #ffffffcc;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 th,
 td {
-  padding: 12px 16px;
+  padding: 14px 18px;
   text-align: left;
   font-size: 0.95rem;
+  color: #102f3e;
 }
 
 thead {
   background: #e8e2e2;
 }
 
+th {
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+th:hover {
+  background: #dcd6d6;
+}
+
 tbody tr {
   border-bottom: 1px solid rgba(47, 88, 117, 0.12);
 }
 
-.menu-cell {
-  width: 64px;
-}
-
-.menu {
-  position: relative;
-}
-
-.menu-trigger {
-  border: none;
-  background: transparent;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.menu .menu-list {
-  left: auto;
-  right: 0;
+tbody tr:last-child {
+  border-bottom: none;
 }
 
 .empty-state {
   text-align: center;
   color: #4c5f68;
+  padding: 20px 0;
+  font-style: italic;
 }
 
 @media (max-width: 900px) {
@@ -142,7 +96,130 @@ tbody tr {
     padding: 40px 20px 60px;
   }
 
-  .filters {
-    align-items: stretch;
+  table {
+    font-size: 0.85rem;
+  }
+
+  th,
+  td {
+    padding: 10px 12px;
+  }
+}
+
+.menu-cell {
+  text-align: center;
+}
+
+.menu-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  min-width: 120px;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.dropdown-menu li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.dropdown-menu li:hover {
+  background: #eef8f5;
+}
+
+/* === Modal styles === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* центрування */
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  border: 2px solid #53B09B;
+  max-width: 400px;
+  width: 90%;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.delete {
+  border-color: #c0392b;
+}
+
+.modal.delete h3 {
+  color: #c0392b;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-save {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+}
+
+.btn-save:hover {
+  background: #e74c3c;
+}
+
+.btn-cancel {
+  background: #BBFDD6;
+  color: #2A516A;
+  border: 1px solid #0AAE87;
+}
+
+.btn-cancel:hover {
+  background: #88FFE3;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
   }
 }

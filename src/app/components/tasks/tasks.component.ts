@@ -12,10 +12,10 @@ import { Task, TasksService } from '../../services/tasks.service';
   standalone: true,
   imports: [CommonModule, FormsModule, HeaderComponent],
   templateUrl: './tasks.component.html',
-  styleUrl: './tasks.component.scss'
+  styleUrls: ['./tasks.component.scss']
 })
 export class TasksComponent implements OnInit {
-  currentUser: ReturnType<AuthService['getCurrentUser']> = null;
+  currentUser: any = null; // English: will be set after fetching profile
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
   categories: Category[] = [];
@@ -31,7 +31,7 @@ export class TasksComponent implements OnInit {
   showPriorityFilter = false;
   openTaskMenuId: number | null = null;
 
-  // Modal state for delete confirmation
+  // English: modal state for delete confirmation
   showDeleteModal = false;
   selectedTask: Task | null = null;
 
@@ -43,19 +43,31 @@ export class TasksComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser();
-    this.loadCategories();
-    this.loadTasks();
+    // English: fetch current user profile
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        this.loadCategories();
+        this.loadTasks();
+      },
+      error: (err) => {
+        console.error('Failed to load current user:', err);
+        this.currentUser = null;
+      }
+    });
   }
 
+  /** Load tasks for current user */
   loadTasks(): void {
-    const userId = this.currentUser?.id;
+    if (!this.currentUser) return;
+    const userId = this.currentUser.id;
     this.tasksService.getTasks(userId).subscribe((tasks) => {
       this.tasks = tasks;
       this.applyFilters();
     });
   }
 
+  /** Load categories */
   loadCategories(): void {
     this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
@@ -100,14 +112,14 @@ export class TasksComponent implements OnInit {
     this.router.navigate(['/tasks', task.id, 'edit']);
   }
 
-  // Open delete confirmation modal
+  /** Open delete confirmation modal */
   confirmDelete(task: Task): void {
     this.selectedTask = task;
     this.showDeleteModal = true;
     this.openTaskMenuId = null;
   }
 
-  // Delete task after confirmation
+  /** Delete task after confirmation */
   deleteTaskConfirmed(): void {
     if (this.selectedTask) {
       this.tasksService.deleteTask(this.selectedTask.id).subscribe(() => {
@@ -117,7 +129,7 @@ export class TasksComponent implements OnInit {
     }
   }
 
-  // Cancel delete modal
+  /** Cancel delete modal */
   cancelDelete(): void {
     this.showDeleteModal = false;
     this.selectedTask = null;
@@ -132,6 +144,7 @@ export class TasksComponent implements OnInit {
     this.router.navigate(['/auth']);
   }
 
+  /** Apply filters to tasks */
   private applyFilters(): void {
     this.filteredTasks = this.tasks.filter((task) => {
       const matchesStatus = this.selectedStatus === 'All' || task.status === this.selectedStatus;

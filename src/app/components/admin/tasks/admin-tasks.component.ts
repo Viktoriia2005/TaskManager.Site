@@ -1,5 +1,14 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+// English: Material-based read-only tasks view (mat-table + mat-menu filters)
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+
 import { TasksService, Task } from '../../../services/tasks.service';
 import { CategoriesService, Category } from '../../../services/categories.service';
 import { AuthService } from '../../../services/auth.service';
@@ -7,21 +16,33 @@ import { AuthService } from '../../../services/auth.service';
 @Component({
   selector: 'app-admin-tasks',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatSortModule
+  ],
   templateUrl: './admin-tasks.component.html',
   styleUrls: ['./admin-tasks.component.scss']
 })
 export class AdminTasksComponent implements OnInit {
-  tasks: Task[] = [];              // all tasks
-  filteredTasks: Task[] = [];      // tasks after filters/sorting
-  categories: Category[] = [];     // categories
-  adminName: string | null = null; // current admin name
+  // English: table and sorting
+  displayedColumns: string[] = ['title', 'priority', 'status', 'user'];
+  dataSource = new MatTableDataSource<Task>([]);
+  @ViewChild(MatSort) sort!: MatSort;
 
-  sortColumn: string = '';         // current sort column
-  sortDirection: 'asc' | 'desc' = 'asc'; // sort direction
+  // English: data
+  tasks: Task[] = [];
+  filteredTasks: Task[] = [];
+  categories: Category[] = [];
+  adminName: string | null = null;
 
-  activeFilter: string | null = null; // which filter menu is open
-  filterMenuPosition = { top: 0, left: 0 };
+  // English: sort state (kept for UI arrows)
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(
     private tasksService: TasksService,
@@ -35,29 +56,47 @@ export class AdminTasksComponent implements OnInit {
     this.loadAdminName();
   }
 
+  ngAfterViewInit(): void {
+    // English: attach MatSort to dataSource
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
+  }
+
+  /** Load tasks from backend */
   loadTasks(): void {
     this.tasksService.getTasks().subscribe({
-      next: (data) => {
+      next: (data: Task[]) => {
         this.tasks = data;
         this.filteredTasks = [...data];
+        this.dataSource.data = this.filteredTasks;
       },
-      error: (err) => console.error('Failed to load tasks:', err)
+      error: (err: any) => console.error('Failed to load tasks:', err)
     });
   }
 
+  /** Load categories (kept for potential future use) */
   loadCategories(): void {
     this.categoriesService.getCategories().subscribe({
-      next: (data) => this.categories = data,
-      error: (err) => console.error('Failed to load categories:', err)
+      next: (data: Category[]) => this.categories = data,
+      error: (err: any) => console.error('Failed to load categories:', err)
     });
   }
 
+  /** Load admin name from user profile */
   loadAdminName(): void {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) this.adminName = currentUser.name;
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.adminName = user.name;
+      },
+      error: (err) => {
+        console.error('Failed to load admin name:', err);
+        this.adminName = null;
+      }
+    });
   }
 
-  // Sorting for Title and User
+  /** Sorting for Title and User columns */
   sortTasks(column: string): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -74,50 +113,31 @@ export class AdminTasksComponent implements OnInit {
         ? valueA.toString().localeCompare(valueB.toString())
         : valueB.toString().localeCompare(valueA.toString());
     });
+
+    // English: update dataSource for mat-table
+    this.dataSource.data = this.filteredTasks;
   }
 
+  /** Get sort arrow symbol for UI */
   getSortArrow(column: string): string {
     if (this.sortColumn !== column) return '↕';
     return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
-  // Toggle filter menu
-  toggleFilterMenu(field: string, event: MouseEvent): void {
-    if (this.activeFilter === field) {
-      this.activeFilter = null;
-      return;
-    }
-    this.activeFilter = field;
-    const rect = (event.target as HTMLElement).getBoundingClientRect();
-    this.filterMenuPosition = {
-      top: rect.bottom + window.scrollY,
-      left: rect.left + window.scrollX
-    };
-  }
-
-  // Apply filter
+  /** Apply filter (called from mat-menu items) */
   applyFilter(field: string, value: string | null): void {
     if (!value) {
       this.filteredTasks = [...this.tasks];
     } else {
       this.filteredTasks = this.tasks.filter(t => (t as any)[field] === value);
     }
-    this.activeFilter = null;
+    this.dataSource.data = this.filteredTasks;
   }
 
-  // Get filter options
+  /** Provide filter options */
   getFilterOptions(field: string): string[] {
     if (field === 'priority') return ['low', 'medium', 'high'];
     if (field === 'status') return ['new', 'in_progress', 'done'];
     return [];
-  }
-
-  // Close filter menu when clicking outside
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.menu-btn') && !target.closest('.dropdown-menu')) {
-      this.activeFilter = null;
-    }
   }
 }

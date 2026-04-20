@@ -1,65 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
+
 $dark-green: #099070;
-$mint: #88FFE3;
-$light-green: #BBFDD6;
-$blue-green: #0AAE87;
-$navy: #0AAE87;
-$teal: #53B09B;
-$header-height: 60px;
+$mint: #88ffe3;
+$light-green: #bbfdd6;
+$blue-green: #0aae87;
+$navy: #0aae87;
+$teal: #53b09b;
 
-/* Header / toolbar */
-mat-toolbar.header {
-  /* English: keep toolbar fixed and use Material toolbar element */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 2000;
-  background: $navy;
-  color: white;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: 'Martel Sans', sans-serif;
-  height: $header-height;
-
-  .title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  span {
-    font-size: 1.05rem;
-  }
-}
-
-/* Page container */
-.container,
-.categories {
-  /* English: main content area below the fixed toolbar */
+.container {
   background: $mint;
-  padding: 1rem;
-  min-height: calc(100vh - 70px);
-  margin-top: 70px;
   font-family: 'Martel Sans', sans-serif;
 }
 
-/* Section header */
-.categories h2 {
-  text-align: center;
-  margin-top: 0;
-  color: black;
-  font-size: 1.5rem;
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    color: black;
+    font-size: 1.5rem;
+  }
 }
 
-/* Add button — use Material button but keep visual identity */
 .toolbar-row button[mat-flat-button] {
-  /* English: style the Material flat button to match previous look */
   background: $navy;
   color: white;
-  border-radius: 4px;
+  border-radius: 10px;
   padding: 0.5rem 1rem;
   display: inline-flex;
   align-items: center;
@@ -70,7 +40,6 @@ mat-toolbar.header {
   background: $dark-green;
 }
 
-/* Table wrapper */
 .table-wrap {
   overflow: auto;
   display: flex;
@@ -78,17 +47,14 @@ mat-toolbar.header {
   padding: 1rem 0;
 }
 
-/* Material table adjustments */
 table.mat-table {
   width: 80%;
   background: white;
   border-radius: 4px;
   overflow: hidden;
-  /* English: add subtle elevation if not provided by mat-elevation class */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* Header row */
 .mat-header-row {
   background: $light-green;
 }
@@ -101,11 +67,8 @@ table.mat-table {
   border-bottom: 2px solid $blue-green;
 }
 
-/* Body cells */
-.mat-row {
-  &:hover {
-    background: #f5f5f5;
-  }
+.mat-row:hover {
+  background: #f5f5f5;
 }
 
 .mat-cell {
@@ -114,27 +77,21 @@ table.mat-table {
   color: #333;
 }
 
-/* Action buttons inside table — use mat-icon-button but style spacing */
 .mat-cell button[mat-icon-button] {
   margin-right: 0.25rem;
 }
 
-/* Empty state */
 .empty-state {
   padding: 24px;
   text-align: center;
   color: rgba(0, 0, 0, 0.6);
 }
 
-/* Dialogs: Material dialog container and mat-card inside dialog */
 .mat-dialog-container {
-  /* English: ensure dialog uses rounded corners and border color similar to previous modal */
   padding: 0;
-  /* mat-card handles inner padding */
   border-radius: 8px;
 }
 
-/* Card inside dialog */
 mat-card {
   border: 2px solid $teal;
   border-radius: 8px;
@@ -155,7 +112,6 @@ mat-card {
   }
 }
 
-/* Confirm dialog specific */
 .confirm-dialog mat-card {
   border-color: #c0392b;
 
@@ -165,33 +121,24 @@ mat-card {
     font-weight: 600;
   }
 
-  button[mat-flat-button][color="warn"] {
+  button[mat-flat-button][color='warn'] {
     background: #c0392b;
     color: white;
   }
 }
 
-/* Keep legacy modal styles only if you still have non-Material modals */
-/* English: these are kept for backward compatibility but not used by MatDialog */
-.modal-overlay {
-  display: none;
-  /* hide legacy overlay when using MatDialog */
-}
-
+.modal-overlay,
 .modal {
   display: none;
-  /* hide legacy modal */
 }
 
-/* Responsive tweaks */
 @media (max-width: 900px) {
-  table.mat-table {
-    width: 100%;
-  }
-
   .toolbar-row {
     flex-direction: column;
-    gap: 0.5rem;
     align-items: stretch;
+  }
+
+  table.mat-table {
+    width: 100%;
   }
 }

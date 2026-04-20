@@ -52,8 +52,9 @@ export class AuthComponent {
         this.authService.saveSession(res);
 
         this.authService.getCurrentUser().subscribe({
-          next: (user) => {
-            if (user.roleId === 1) {
+          next: (res) => {
+            const user = res?.user;
+            if (user?.roleId === 1) {
               this.router.navigate(['/admin/roles']);
             } else {
               this.router.navigate(['/user/tasks']);
@@ -80,7 +81,7 @@ export class AuthComponent {
         this.authService.saveSession(res);
 
         this.authService.getCurrentUser().subscribe({
-          next: (user) => {
+          next: () => {
             this.router.navigate(['/user/tasks']);
           },
           error: () => {

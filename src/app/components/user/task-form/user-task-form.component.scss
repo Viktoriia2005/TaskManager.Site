@@ -5,19 +5,8 @@
   font-family: 'Martel Sans', sans-serif;
 }
 
-/* Top toolbar */
-.topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 3000;
-}
-
 /* Page layout */
 .task-form-page {
-  padding-top: 64px;
-  /* account for toolbar */
   min-height: 100vh;
   background: linear-gradient(135deg, #c7f8cf 0%, #b6f3d5 100%);
 }

@@ -1,37 +1,29 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatIconModule,
+    MatButtonModule
+  ],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
   @Input() userName = 'User';
   @Input() tasks: { id: number; title: string }[] = [];
   @Output() logoutClick = new EventEmitter<void>();
 
-  showTasksMenu = false;
-  showUserMenu = false;
-
-  toggleTasksMenu(): void {
-    this.showTasksMenu = !this.showTasksMenu;
-    if (this.showTasksMenu) {
-      this.showUserMenu = false;
-    }
-  }
-
-  toggleUserMenu(): void {
-    this.showUserMenu = !this.showUserMenu;
-    if (this.showUserMenu) {
-      this.showTasksMenu = false;
-    }
-  }
-
   logout(): void {
-    this.showUserMenu = false;
     this.logoutClick.emit();
   }
 }

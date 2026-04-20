@@ -1,14 +1,38 @@
-<div class="admin-container">
-  <nav class="sidebar">
-    <ul>
-      <li (click)="navigate('roles')">👥 Roles</li>
-      <li (click)="navigate('categories')">📂 Categories</li>
-      <li (click)="navigate('tasks')">🔑 Tasks</li>
-      <li class="logout" (click)="logout()">🚪 Logout</li>
-    </ul>
-  </nav>
+<!-- English: Material sidenav layout without global topbar -->
+<mat-sidenav-container class="admin-sidenav-container">
+  <!-- Sidenav: fixed on the left, nav items pushed to bottom -->
+  <mat-sidenav #sidenav class="admin-sidenav" mode="side" [opened]="true" fixedInViewport>
+    <div class="sidenav-spacer" aria-hidden="true"></div>
 
-  <div class="admin-content">
-    <router-outlet></router-outlet>
-  </div>
-</div>
+    <mat-nav-list class="compact-nav">
+      <a mat-list-item routerLink="/admin/roles" routerLinkActive="active" class="nav-item">
+        <div class="icon-wrap"><mat-icon>groups</mat-icon></div>
+        <div class="label">Roles</div>
+      </a>
+
+      <a mat-list-item routerLink="/admin/categories" routerLinkActive="active" class="nav-item">
+        <div class="icon-wrap"><mat-icon>folder</mat-icon></div>
+        <div class="label">Categories</div>
+      </a>
+
+      <a mat-list-item routerLink="/admin/tasks" routerLinkActive="active" class="nav-item">
+        <div class="icon-wrap"><mat-icon>task</mat-icon></div>
+        <div class="label">Tasks</div>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item (click)="logout()" class="nav-item logout">
+        <div class="icon-wrap"><mat-icon>logout</mat-icon></div>
+        <div class="label">Logout</div>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Main content -->
+  <mat-sidenav-content>
+    <div class="admin-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

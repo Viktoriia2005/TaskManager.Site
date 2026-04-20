@@ -5,30 +5,32 @@
   font-family: 'Martel Sans', sans-serif;
 }
 
-/* Toolbar styling */
 .header-toolbar {
+  min-height: 60px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: #2f5875;
-  /* custom background color */
-  color: #fff;
-  /* default text color */
   padding: 0 20px;
+  color: #fff;
+  box-sizing: border-box;
 }
 
-/* Title text */
+.header-toolbar.user-theme {
+  background: #2a516a;
+}
+
+.header-toolbar.admin-theme {
+  background: #0aae87;
+}
+
 .title {
   font-size: 1.7rem;
   font-weight: 700;
 }
 
-/* Spacer pushes elements to the right */
 .spacer {
   flex: 1 1 auto;
 }
 
-/* Welcome text styling */
 .welcome {
   font-size: 1.2rem;
   font-weight: 600;
@@ -36,40 +38,42 @@
   white-space: nowrap;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .welcome {
-    font-size: 0.8rem;
-    margin-right: 8px;
-  }
-}
-
-@media (max-width: 768px) {
-  .welcome {
-    font-size: 0.75rem;
-    margin-right: 4px;
-  }
-}
-
-/* Default icon button styling */
 .mat-icon-button {
   color: #fff;
-  background: #5eabde;
+  background: rgba(255, 255, 255, 0.14);
 }
 
-/* Menu item styling */
 .mat-menu-item {
   font-family: 'Martel Sans', sans-serif;
   font-size: 0.9rem;
 }
 
-/* Hover effect for menu items */
 .mat-menu-item:hover {
   background: #eef9f6;
 }
 
 .user-icon {
-  color: #88FFE3;
+  color: #88ffe3;
   font-size: 25px;
-  /* static turquoise color */
+}
+
+@media (max-width: 1200px) {
+  .welcome {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-toolbar {
+    padding: 0 12px;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .welcome {
+    font-size: 0.85rem;
+    margin-right: 8px;
+  }
 }

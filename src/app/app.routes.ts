@@ -10,7 +10,7 @@ import { UserTasksComponent } from './components/user/tasks/user-tasks.component
 import { UserTaskFormComponent } from './components/user/task-form/user-task-form.component';
 
 /* Guards */
-import { authPageGuard, userPageGuard } from './guards/auth.guards';
+import { adminGuard, userPageGuard } from './guards/auth.guards';
 import { roleAdminGuard, roleUserGuard } from './guards/role.guards';
 
 /**
@@ -18,7 +18,7 @@ import { roleAdminGuard, roleUserGuard } from './guards/role.guards';
  */
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'user/tasks' },
-  { path: 'auth', component: AuthComponent, canActivate: [authPageGuard] },
+  { path: 'auth', component: AuthComponent, canActivate: [adminGuard] },
 
   {
     path: 'admin',

@@ -1,35 +1,64 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { map, catchError, of } from 'rxjs';
 
-export const roleAdminGuard = (route: any, state: any) => {
+/**
+ * Guard for admin routes.
+ * Allows access only if user roleId === 1 (admin).
+ */
+export const roleAdminGuard = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const user = authService.getCurrentUser();
-
-  // Перевірка: чи користувач має roleId === 1 (адмін)
-  const isAdmin = user && user.roleId === 1;
-
-  if (!isAdmin) {
-    router.navigate(['/user/tasks']);
-    return false;
+  // First check if token exists
+  if (!authService.isAuthenticated()) {
+    router.navigate(['/auth']);
+    return of(false);
   }
 
-  return true;
+  return authService.getCurrentUser().pipe(
+    map(res => {
+      const user = res?.user;
+      if (user && user.roleId === 1) {
+        return true;
+      }
+      router.navigate(['/user/tasks']);
+      return false;
+    }),
+    catchError(() => {
+      router.navigate(['/auth']);
+      return of(false);
+    })
+  );
 };
 
-export const roleUserGuard = (route: any, state: any) => {
+/**
+ * Guard for user routes.
+ * Allows access only if user roleId !== 1 (not admin).
+ */
+export const roleUserGuard = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const user = authService.getCurrentUser();
-
-  // Перевірка: чи користувач існує
-  if (!user) {
+  // First check if token exists
+  if (!authService.isAuthenticated()) {
     router.navigate(['/auth']);
-    return false;
+    return of(false);
   }
 
-  return true;
+  return authService.getCurrentUser().pipe(
+    map(res => {
+      const user = res?.user;
+      if (user && user.roleId !== 1) {
+        return true;
+      }
+      router.navigate(['/auth']);
+      return false;
+    }),
+    catchError(() => {
+      router.navigate(['/auth']);
+      return of(false);
+    })
+  );
 };

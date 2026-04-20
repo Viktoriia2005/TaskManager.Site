@@ -2,10 +2,13 @@ $dark-green: #099070;
 $mint: #88FFE3;
 $light-green: #BBFDD6;
 $blue-green: #0AAE87;
-$navy: #2A516A;
+$navy: #0AAE87;
 $teal: #53B09B;
+$header-height: 60px;
 
-.header {
+/* Header / toolbar */
+mat-toolbar.header {
+  /* English: keep toolbar fixed and use Material toolbar element */
   position: fixed;
   top: 0;
   left: 0;
@@ -18,228 +21,177 @@ $teal: #53B09B;
   justify-content: space-between;
   align-items: center;
   font-family: 'Martel Sans', sans-serif;
+  height: $header-height;
 
-  h1 {
+  .title {
     margin: 0;
     font-size: 1.5rem;
     font-weight: 600;
   }
 
   span {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
   }
 }
 
+/* Page container */
+.container,
 .categories {
+  /* English: main content area below the fixed toolbar */
   background: $mint;
   padding: 1rem;
   min-height: calc(100vh - 70px);
   margin-top: 70px;
   font-family: 'Martel Sans', sans-serif;
+}
 
-  h2 {
-    text-align: center;
-    margin-top: 0;
-    color: $navy;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-  }
+/* Section header */
+.categories h2 {
+  text-align: center;
+  margin-top: 0;
+  color: black;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
 
-  .btn-add {
-    background: $navy;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-    transition: background 0.3s;
+/* Add button — use Material button but keep visual identity */
+.toolbar-row button[mat-flat-button] {
+  /* English: style the Material flat button to match previous look */
+  background: $navy;
+  color: white;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-    &:hover {
-      background: $dark-green;
-    }
-  }
+.toolbar-row button[mat-flat-button]:hover {
+  background: $dark-green;
+}
 
-  table {
-    width: 80%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 4px;
-    overflow: hidden;
+/* Table wrapper */
+.table-wrap {
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
 
-    thead {
-      background: $light-green;
+/* Material table adjustments */
+table.mat-table {
+  width: 80%;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  /* English: add subtle elevation if not provided by mat-elevation class */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
 
-      tr {
-        th {
-          padding: 1rem;
-          text-align: left;
-          font-weight: 600;
-          color: $navy;
-          border-bottom: 2px solid $blue-green;
-        }
-      }
-    }
+/* Header row */
+.mat-header-row {
+  background: $light-green;
+}
 
-    tbody {
-      tr {
-        &:hover {
-          background: #f5f5f5;
-        }
+.mat-header-cell {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: black;
+  border-bottom: 2px solid $blue-green;
+}
 
-        td {
-          padding: 1rem;
-          border-bottom: 1px solid #ddd;
-          color: #333;
-
-          button {
-            border: none;
-            padding: 0.5rem 0.75rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.3s;
-            margin-right: 0.5rem;
-
-            &.btn-edit {
-              background: $blue-green;
-              color: white;
-
-              &:hover {
-                background: $teal;
-              }
-            }
-
-            &.btn-delete {
-              background: #e74c3c;
-              color: white;
-
-              &:hover {
-                background: #c0392b;
-              }
-            }
-          }
-        }
-      }
-    }
+/* Body cells */
+.mat-row {
+  &:hover {
+    background: #f5f5f5;
   }
 }
 
+.mat-cell {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+/* Action buttons inside table — use mat-icon-button but style spacing */
+.mat-cell button[mat-icon-button] {
+  margin-right: 0.25rem;
+}
+
+/* Empty state */
+.empty-state {
+  padding: 24px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Dialogs: Material dialog container and mat-card inside dialog */
+.mat-dialog-container {
+  /* English: ensure dialog uses rounded corners and border color similar to previous modal */
+  padding: 0;
+  /* mat-card handles inner padding */
+  border-radius: 8px;
+}
+
+/* Card inside dialog */
+mat-card {
+  border: 2px solid $teal;
+  border-radius: 8px;
+
+  mat-card-title {
+    font-weight: 600;
+    color: $navy;
+  }
+
+  .dialog-form .full-width {
+    width: 100%;
+  }
+
+  mat-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+
+/* Confirm dialog specific */
+.confirm-dialog mat-card {
+  border-color: #c0392b;
+
+  mat-card-title,
+  p {
+    color: #c0392b;
+    font-weight: 600;
+  }
+
+  button[mat-flat-button][color="warn"] {
+    background: #c0392b;
+    color: white;
+  }
+}
+
+/* Keep legacy modal styles only if you still have non-Material modals */
+/* English: these are kept for backward compatibility but not used by MatDialog */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  display: none;
+  /* hide legacy overlay when using MatDialog */
 }
 
 .modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  border: 2px solid $teal;
-
-  .modal-content {
-    h3 {
-      margin-top: 0;
-      color: $navy;
-      font-size: 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 1.5rem;
-
-      label {
-        color: $navy;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-      }
-
-      input,
-      textarea {
-        padding: 0.75rem;
-        border: 1px solid $light-green;
-        border-radius: 4px;
-        font-size: 1rem;
-        font-family: inherit;
-
-        &:focus {
-          outline: none;
-          border-color: $blue-green;
-          box-shadow: 0 0 0 2px rgba(10, 174, 135, 0.1);
-        }
-      }
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 2rem;
-
-      button {
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background 0.3s;
-
-        &.btn-save {
-          background: $navy;
-          color: white;
-
-          &:hover {
-            background: $dark-green;
-          }
-        }
-
-        &.btn-cancel {
-          background: $light-green;
-          color: $navy;
-          border: 1px solid $blue-green;
-
-          &:hover {
-            background: $mint;
-          }
-        }
-      }
-    }
-  }
+  display: none;
+  /* hide legacy modal */
 }
 
-.modal.delete {
-  border: 2px solid #c0392b;
+/* Responsive tweaks */
+@media (max-width: 900px) {
+  table.mat-table {
+    width: 100%;
+  }
 
-  .modal-content {
-    h3 {
-      color: #c0392b;
-      font-weight: 600;
-    }
-
-    .modal-actions {
-      button {
-        &.btn-save {
-          background: #c0392b;
-          color: white;
-
-          &:hover {
-            background: #e74c3c;
-          }
-        }
-      }
-    }
+  .toolbar-row {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
   }
 }

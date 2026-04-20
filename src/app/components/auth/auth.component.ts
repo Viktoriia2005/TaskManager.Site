@@ -4,10 +4,25 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
+/* Angular Material modules used by this component */
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
+  ],
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
 })
@@ -22,8 +37,9 @@ export class AuthComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {}
+  ) { }
 
+  /** Toggle between login and register mode */
   toggleMode() {
     this.isRegister = !this.isRegister;
     this.registerError = '';
@@ -31,40 +47,30 @@ export class AuthComponent {
   }
 
   login() {
-    this.loginError = '';
-
     this.authService.login(this.loginData.email, this.loginData.password).subscribe({
       next: (res) => {
-        console.log('Login response:', res);
-        console.log('User roleId:', res.user.roleId);
-        
         this.authService.saveSession(res);
-        
-        // Перенаправити залежно від ролі
-        const user = res.user;
-        if (user.roleId === 1) {
-          // Administrator
-          console.log('Redirecting to admin');
-          this.router.navigate(['/admin/roles']);
-        } else {
-          // Regular user
-          console.log('Redirecting to user tasks');
-          this.router.navigate(['/user/tasks']);
-        }
+
+        this.authService.getCurrentUser().subscribe({
+          next: (user) => {
+            if (user.roleId === 1) {
+              this.router.navigate(['/admin/roles']);
+            } else {
+              this.router.navigate(['/user/tasks']);
+            }
+          },
+          error: () => {
+            this.loginError = 'Failed to fetch user profile.';
+          }
+        });
       },
-      error: (err) => {
-        this.loginError = this.extractErrorMessage(err, 'Login failed.');
-        console.error('Login error:', err);
+      error: () => {
+        this.loginError = 'Login failed.';
       }
     });
   }
 
   register() {
-    this.registerError = this.validateRegisterForm();
-    if (this.registerError) {
-      return;
-    }
-
     this.authService.register(
       this.registerData.name,
       this.registerData.email,
@@ -72,16 +78,23 @@ export class AuthComponent {
     ).subscribe({
       next: (res) => {
         this.authService.saveSession(res);
-        // Новий користувач завжди отримує роль User (roleId = 2)
-        this.router.navigate(['/user/tasks']);
+
+        this.authService.getCurrentUser().subscribe({
+          next: (user) => {
+            this.router.navigate(['/user/tasks']);
+          },
+          error: () => {
+            this.registerError = 'Failed to fetch user profile.';
+          }
+        });
       },
-      error: (err) => {
-        this.registerError = this.extractErrorMessage(err, 'Registration failed.');
-        console.error('Register error:', err);
+      error: () => {
+        this.registerError = 'Registration failed.';
       }
     });
   }
 
+  /** Validate registration form fields */
   private validateRegisterForm(): string {
     const name = this.registerData.name.trim();
     const email = this.registerData.email.trim();
@@ -107,6 +120,8 @@ export class AuthComponent {
 
     return '';
   }
+
+  /** Extract error message from backend response */
   private extractErrorMessage(err: any, fallback: string): string {
     const message = err?.error?.message;
 

@@ -1,11 +1,6 @@
-<mat-toolbar color="primary" class="topbar">
-  <span>Task Manager</span>
-  <span class="spacer"></span>
-  <button mat-button (click)="logout()">Logout</button>
-</mat-toolbar>
-
 <div class="task-form-page">
-  <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="headerTasks" (logoutClick)="logout()"></app-header>
+  <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="headerTasks" theme="user"
+    (logoutClick)="logout()"></app-header>
 
   <section class="task-form-shell">
     <mat-card class="task-card">

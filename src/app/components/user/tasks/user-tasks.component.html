@@ -1,7 +1,8 @@
 <!-- Material-based user tasks view -->
 <div class="tasks-page">
   <!-- Keep existing header component -->
-  <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="tasks" (logoutClick)="logout()"></app-header>
+  <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="tasks" theme="user"
+    (logoutClick)="logout()"></app-header>
 
   <main class="dashboard">
     <!-- Main page heading -->

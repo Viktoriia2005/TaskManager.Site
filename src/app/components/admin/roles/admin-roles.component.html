@@ -1,65 +1,83 @@
-<div class="header">
-  <h1>Task Manager</h1>
+<!-- English: Material header and table layout; menu and dialogs use Angular Material -->
+<mat-toolbar color="primary" class="header">
+  <span class="title">Task Manager</span>
+  <span class="spacer"></span>
   <span>Welcome, admin {{ adminName }}</span>
-</div>
+</mat-toolbar>
 
 <div class="roles">
   <h2>Manage Roles</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Role</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let user of users" (dblclick)="editRole(user)">
-        <td>{{ user.name }}</td>
-        <td class="role-cell">
-          {{ getRoleName(user.roleId) }}
-          <button class="menu-btn" (click)="toggleMenu(user, $event)">⋮</button>
+
+  <!-- English: Material table with dataSource and sort (if needed) -->
+  <div class="table-wrap">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z2" matSort>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+        <td mat-cell *matCellDef="let user"> {{ user.name }} </td>
+      </ng-container>
+
+      <!-- Role Column -->
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef> Role </th>
+        <td mat-cell *matCellDef="let user">
+          <div class="role-cell">
+            <span>{{ getRoleName(user.roleId) }}</span>
+
+            <!-- English: use mat-menu for per-row actions -->
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="setActiveUser(user, $event)"
+              aria-label="Open menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </div>
         </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+      </ng-container>
 
-<!-- Context menu -->
-<ul *ngIf="activeUser" class="dropdown-menu" [style.top.px]="menuPosition.top" [style.left.px]="menuPosition.left">
-  <li (click)="editRole(activeUser)">Edit</li>
-  <li (click)="confirmDelete(activeUser)">Delete</li>
-</ul>
-
-<!-- Modal for editing role -->
-<div *ngIf="showRoleModal" class="modal-overlay" (click)="cancel()"></div>
-<div *ngIf="showRoleModal" class="modal">
-  <div class="modal-content">
-    <h3>Edit {{ selectedUser?.name }} role</h3>
-    <div class="role-options">
-      <label class="radio-label">
-        <input type="radio" [(ngModel)]="selectedUser!.roleId" [value]="2" name="role" />
-        User
-      </label>
-      <label class="radio-label">
-        <input type="radio" [(ngModel)]="selectedUser!.roleId" [value]="1" name="role" />
-        Admin
-      </label>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-save" (click)="saveRole()">Save</button>
-      <button class="btn-cancel" (click)="cancel()">Cancel</button>
-    </div>
+      <!-- Header and Row definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="openEditDialog(row)"></tr>
+    </table>
   </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!users.length" class="empty-state">No users yet</div>
 </div>
 
-<!-- Modal for deleting user -->
-<div *ngIf="showDeleteModal" class="modal-overlay" (click)="cancelDelete()"></div>
-<div *ngIf="showDeleteModal" class="modal">
-  <div class="modal-content">
-    <h3>Are you sure you want to delete this user {{ selectedUser?.name }}?</h3>
-    <div class="modal-actions">
-      <button class="btn-save" (click)="deleteUserConfirmed()">Yes</button>
-      <button class="btn-cancel" (click)="cancelDelete()">No</button>
-    </div>
-  </div>
-</div>
+<!-- English: shared mat-menu for row actions -->
+<mat-menu #rowMenu="matMenu">
+  <button mat-menu-item (click)="openEditDialog(activeUser)">
+    <mat-icon>edit</mat-icon>
+    <span>Edit</span>
+  </button>
+  <button mat-menu-item (click)="openDeleteDialog(activeUser)">
+    <mat-icon>delete</mat-icon>
+    <span>Delete</span>
+  </button>
+</mat-menu>
+
+<!-- English: Edit role dialog template -->
+<ng-template #editDialog let-data>
+  <h2 mat-dialog-title>Edit {{ data.name }} role</h2>
+  <mat-dialog-content>
+    <mat-radio-group [(ngModel)]="editRoleId">
+      <mat-radio-button *ngFor="let r of roles" [value]="r.id">{{ r.name }}</mat-radio-button>
+    </mat-radio-group>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef?.close()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="saveRole()">Save</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<!-- English: Delete confirmation dialog template -->
+<ng-template #deleteDialog let-data>
+  <h2 mat-dialog-title>Confirm delete</h2>
+  <mat-dialog-content>
+    Are you sure you want to delete <strong>{{ data.name }}</strong>?
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef?.close()">No</button>
+    <button mat-flat-button color="warn" (click)="deleteUserConfirmed()">Yes</button>
+  </mat-dialog-actions>
+</ng-template>

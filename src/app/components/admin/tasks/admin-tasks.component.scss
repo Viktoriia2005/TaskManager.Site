@@ -1,214 +1,112 @@
 @import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
 
-$dark-green: #099070;
+$header-height: 60px;
 $mint: #88FFE3;
 $light-green: #BBFDD6;
 $blue-green: #0AAE87;
-$navy: #2A516A;
-$teal: #53B09B;
+$navy: #0AAE87;
 
+/* Header fixed on top */
+mat-toolbar.header,
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 2000;
   background: $navy;
   color: white;
-  padding: 1rem;
+  height: $header-height;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  padding: 0 1rem;
   font-family: 'Martel Sans', sans-serif;
 
-  h1 {
-    margin: 0;
+  .title {
     font-size: 1.5rem;
     font-weight: 600;
   }
 
-  span {
-    font-size: 0.9rem;
+  .spacer {
+    flex: 1 1 auto;
   }
 }
 
+/* Main content below header */
 .tasks {
   background: $mint;
   padding: 1rem;
-  min-height: calc(100vh - 70px);
-  margin-top: 70px;
+  margin-top: $header-height;
+  min-height: calc(100vh - #{$header-height});
   font-family: 'Martel Sans', sans-serif;
 
   h2 {
     text-align: center;
     margin-top: 0;
-    color: $navy;
+    color: black;
     font-size: 1.2rem;
     margin-bottom: 1rem;
   }
-
-  table {
-    width: 80%;
-    margin: 0 auto;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 4px;
-    overflow: hidden;
-
-    thead {
-      background: $light-green;
-
-      tr th {
-        padding: 0.5rem;
-        text-align: left;
-        font-weight: 600;
-        color: $navy;
-        border-bottom: 2px solid $blue-green;
-        font-size: 0.9rem;
-      }
-    }
-
-    tbody tr {
-      &:hover {
-        background: #f5f5f5;
-      }
-
-      td {
-        padding: 0.5rem;
-        border-bottom: 1px solid #ddd;
-        color: #333;
-        font-size: 0.9rem;
-      }
-    }
-  }
 }
 
-/* Модальне вікно для редагування/додавання завдання */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+/* Table wrapper */
+.table-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
 }
 
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+/* mat-table styling */
+table.mat-table {
+  width: 90%;
   background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  border: 2px solid $teal;
-
-  .modal-content {
-    h3 {
-      margin-top: 0;
-      color: $navy;
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 1rem;
-
-      label {
-        color: $navy;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-      }
-
-      input,
-      textarea,
-      select {
-        padding: 0.5rem;
-        border: 1px solid $light-green;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        font-family: inherit;
-
-        &:focus {
-          outline: none;
-          border-color: $blue-green;
-          box-shadow: 0 0 0 2px rgba(10, 174, 135, 0.1);
-        }
-      }
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-
-      button {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: background 0.3s;
-
-        &.btn-save {
-          background: $navy;
-          color: white;
-
-          &:hover {
-            background: $dark-green;
-          }
-        }
-
-        &.btn-cancel {
-          background: $light-green;
-          color: $navy;
-          border: 1px solid $blue-green;
-
-          &:hover {
-            background: $mint;
-          }
-        }
-      }
-    }
-  }
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* Styles for filter/context menus */
-.menu-btn {
-  border: none;
-  background: transparent;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
+/* header row */
+.mat-header-row {
+  background: $light-green;
 }
 
-.dropdown-menu {
-  position: absolute;
-  min-width: 140px;
-  margin: 0;
-  padding: 8px 0;
-  list-style: none;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  z-index: 3000;
-  /* higher than table */
-  font-family: 'Martel Sans', sans-serif;
+.mat-header-cell {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: black;
+  border-bottom: 2px solid $blue-green;
 }
 
-.dropdown-menu li {
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
+/* body cells */
+.mat-row:hover {
+  background: #f5f5f5;
+}
+
+.mat-cell {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #eee;
   color: #333;
 }
 
-.dropdown-menu li:hover {
-  background: #eef8f5;
+/* small helpers */
+.sort-arrow {
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.empty-state {
+  padding: 24px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  table.mat-table {
+    width: 100%;
+  }
+
+  .tasks {
+    padding: 0.75rem;
+  }
 }

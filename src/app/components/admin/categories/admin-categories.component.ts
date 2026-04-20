@@ -1,34 +1,62 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+// Material modules used by this standalone component
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
+
 import { CategoriesService, Category } from '../../../services/categories.service';
 import { AuthService } from '../../../services/auth.service';
+
+// Import standalone dialog components and include them in imports array.
+import { CategoryDialogComponent } from './category-dialog.component';
+import { ConfirmDialogComponent } from './confirm-dialog.component';
 
 @Component({
   selector: 'app-admin-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatToolbarModule,
+    MatTableModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSortModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatCardModule,
+
+    // Include standalone dialog components here so they can be used by MatDialog.
+    CategoryDialogComponent,
+    ConfirmDialogComponent
+  ],
   templateUrl: './admin-categories.component.html',
   styleUrls: ['./admin-categories.component.scss']
 })
 export class AdminCategoriesComponent implements OnInit {
-  // List of categories
+  // Data source for the Material table
   categories: Category[] = [];
+  dataSource = new MatTableDataSource<Category>([]);
+  displayedColumns: string[] = ['name', 'actions'];
 
-  // Modal states
-  showCategoryModal = false;
-  showDeleteModal = false;
-
-  // Selected category for editing/deleting
-  selectedCategory: Partial<Category> | null = null;
-  isEditing = false;
-
-  // Current admin name
+  // Admin name shown in toolbar
   adminName: string | null = null;
+
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private categoriesService: CategoriesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -36,97 +64,110 @@ export class AdminCategoriesComponent implements OnInit {
     this.loadAdminName();
   }
 
-  // Load all categories
+  ngAfterViewInit(): void {
+    // Attach sorting to the data source after view init
+    this.dataSource.sort = this.sort;
+  }
+
+  /** Load categories from backend */
   loadCategories(): void {
     this.categoriesService.getCategories().subscribe({
-      next: (data) => this.categories = data,
-      error: (err) => console.error('Failed to load categories:', err)
+      next: (data) => {
+        this.categories = data;
+        this.dataSource.data = data;
+      },
+      error: (err) => {
+        console.error('Failed to load categories:', err);
+        this.snackBar.open('Failed to load categories', 'Close', { duration: 3000 });
+      }
     });
   }
 
-  // Load current admin name
+  /** Load admin name from user profile */
   loadAdminName(): void {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      this.adminName = currentUser.name;
-    }
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.adminName = user.name;
+      },
+      error: (err) => {
+        console.error('Failed to load admin name:', err);
+        this.adminName = null;
+      }
+    });
   }
 
-  // Open add modal
-  openAddModal(): void {
-    this.selectedCategory = { name: '' };
-    this.isEditing = false;
-    this.showCategoryModal = true;
-  }
+  /** Open dialog to add category */
+  openAddDialog(): void {
+    const ref = this.dialog.open(CategoryDialogComponent, {
+      width: '420px',
+      data: { title: 'Add new category', category: { name: '', description: '' } }
+    });
 
-  // Open edit modal (from button or double click)
-  editCategory(category: Category): void {
-    this.selectedCategory = { ...category };
-    this.isEditing = true;
-    this.showCategoryModal = true;
-  }
-
-  // Save category (create or update)
-  saveCategory(): void {
-    if (!this.selectedCategory || !this.selectedCategory.name?.trim()) {
-      alert('Please enter a category name');
-      return;
-    }
-
-    if (this.isEditing && this.selectedCategory.id) {
-      this.categoriesService.updateCategory(this.selectedCategory.id, this.selectedCategory).subscribe({
-        next: (updatedCategory) => {
-          const index = this.categories.findIndex(c => c.id === updatedCategory.id);
-          if (index !== -1) {
-            this.categories[index] = updatedCategory;
+    ref.afterClosed().subscribe((result: Partial<Category> | undefined) => {
+      if (result) {
+        this.categoriesService.createCategory(result as Category).subscribe({
+          next: (newCategory) => {
+            this.categories.push(newCategory);
+            this.dataSource.data = [...this.categories];
+            this.snackBar.open('Category created', 'Close', { duration: 2000 });
+          },
+          error: (err) => {
+            console.error('Failed to create category:', err);
+            this.snackBar.open('Failed to create category', 'Close', { duration: 3000 });
           }
-          this.cancel();
-        },
-        error: (err) => console.error('Failed to update category:', err)
-      });
-    } else {
-      this.categoriesService.createCategory({
-        name: this.selectedCategory.name!,
-        description: this.selectedCategory.description
-      }).subscribe({
-        next: (newCategory) => {
-          this.categories.push(newCategory);
-          this.cancel();
-        },
-        error: (err) => console.error('Failed to create category:', err)
-      });
-    }
+        });
+      }
+    });
   }
 
-  // Open delete confirmation modal
-  confirmDelete(category: Category): void {
-    this.selectedCategory = { ...category };
-    this.showDeleteModal = true;
+  /** Open dialog to edit category */
+  openEditDialog(category: Category): void {
+    const ref = this.dialog.open(CategoryDialogComponent, {
+      width: '420px',
+      data: { title: 'Edit category', category: { ...category } }
+    });
+
+    ref.afterClosed().subscribe((result: Partial<Category> | undefined) => {
+      if (result && result.id) {
+        this.categoriesService.updateCategory(result.id, result as Category).subscribe({
+          next: (updated) => {
+            const idx = this.categories.findIndex(c => c.id === updated.id);
+            if (idx !== -1) {
+              this.categories[idx] = updated;
+              this.dataSource.data = [...this.categories];
+            }
+            this.snackBar.open('Category updated', 'Close', { duration: 2000 });
+          },
+          error: (err) => {
+            console.error('Failed to update category:', err);
+            this.snackBar.open('Failed to update category', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
-  // Delete category after confirmation
-  deleteCategoryConfirmed(): void {
-    if (this.selectedCategory?.id) {
-      this.categoriesService.deleteCategory(this.selectedCategory.id).subscribe({
-        next: () => {
-          this.categories = this.categories.filter(c => c.id !== this.selectedCategory!.id);
-          this.cancelDelete();
-        },
-        error: (err) => console.error('Failed to delete category:', err)
-      });
-    }
-  }
+  /** Open dialog to delete category */
+  openDeleteDialog(category: Category): void {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '380px',
+      data: { message: `Are you sure you want to delete category "${category.name}"?` }
+    });
 
-  // Cancel edit modal
-  cancel(): void {
-    this.showCategoryModal = false;
-    this.selectedCategory = null;
-    this.isEditing = false;
-  }
-
-  // Cancel delete modal
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.selectedCategory = null;
+    ref.afterClosed().subscribe((confirmed: boolean | undefined) => {
+      if (confirmed) {
+        this.categoriesService.deleteCategory(category.id!).subscribe({
+          next: () => {
+            this.categories = this.categories.filter(c => c.id !== category.id);
+            this.dataSource.data = [...this.categories];
+            this.snackBar.open('Category deleted', 'Close', { duration: 2000 });
+          },
+          error: (err) => {
+            console.error('Failed to delete category:', err);
+            this.snackBar.open('Failed to delete category', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }

@@ -1,61 +1,56 @@
 @import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
 
-$mint: #88FFE3; // background color for container and content
-$blue-green: #099070; // background color for sidebar
-$sidebar-width: 120px; // sidebar width
-$header-height: 60px; // fixed header height
+$mint: #88ffe3;
+$blue-green: #099070;
+$sidebar-width: 120px;
+$header-height: 60px;
+
+:host {
+  display: block;
+  font-family: 'Martel Sans', sans-serif;
+}
 
 .admin-sidenav-container {
-  height: 100vh;
-  font-family: 'Martel Sans', sans-serif;
-  background: $mint; // overall page background
+  height: calc(100vh - #{$header-height});
+  background: $mint;
+  overflow: hidden;
 }
 
-/* Sidebar: fixed block on the left, starts below header, stays behind header */
 .admin-sidenav {
-  // position: fixed;     // if commented, sidebar is not fixed
-  top: $header-height; // offset down by header height
-  left: 0;
   width: $sidebar-width;
-  height: calc(100vh - #{$header-height}); // full viewport height minus header
   background: $blue-green;
   color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   border-right: 1px solid rgba(0, 0, 0, 0.06);
-  z-index: 500; // lower than header, so header stays on top
-  margin-top: 60px; // space below header, if sidebar is not fixed
+  box-sizing: border-box;
 }
 
-/* Navigation list inside sidebar */
 .compact-nav {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px; // spacing between nav items
-  padding-top: 20px; // top padding inside sidebar
-  padding-bottom: 12px; // bottom padding inside sidebar
+  gap: 16px;
+  padding-top: 20px;
+  padding-bottom: 12px;
   width: 100%;
 }
 
-/* Main content: shifted right by sidebar width and down by header height */
-.admin-content {
-  margin-left: $sidebar-width; // space for sidebar
-  margin-top: $header-height; // space for header
-  padding: 24px;
-  min-height: calc(100vh - #{$header-height});
-  background: $mint;
+.nav-item {
+  color: #082d27;
 }
 
-/* Responsive adjustments for small screens */
+.admin-content {
+  height: 100%;
+  padding: 24px 24px 32px;
+  box-sizing: border-box;
+  background: $mint;
+  overflow: auto;
+}
+
 @media (max-width: 600px) {
   .admin-sidenav {
-    width: 56px; // narrower sidebar
+    width: 64px;
   }
 
   .admin-content {
-    margin-left: 40px; // adjust content margin
     padding: 16px;
   }
 }

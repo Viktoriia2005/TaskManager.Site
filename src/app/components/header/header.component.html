@@ -1,14 +1,18 @@
-<mat-toolbar color="primary" class="header-toolbar">
-  <span class="title">Task Manager</span>
+<mat-toolbar color="primary" class="header-toolbar" [class.admin-theme]="theme === 'admin'"
+  [class.user-theme]="theme === 'user'">
+  <span class="title">{{ title }}</span>
   <span class="spacer"></span>
 
-  <span class="welcome">Welcome, {{ userName }}</span>
+  <span class="welcome">Welcome, {{ welcomePrefix }}{{ userName }}</span>
 
-  <!-- User menu -->
   <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
     <mat-icon class="user-icon">account_circle</mat-icon>
   </button>
   <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="openChangePasswordDialog()">
+      <mat-icon>lock</mat-icon>
+      <span>Change Password</span>
+    </button>
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>
       <span>Logout</span>

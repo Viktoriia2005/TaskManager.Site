@@ -1,51 +1,79 @@
+<mat-toolbar color="primary" class="topbar">
+  <span>Task Manager</span>
+  <span class="spacer"></span>
+  <button mat-button (click)="logout()">Logout</button>
+</mat-toolbar>
+
 <div class="task-form-page">
   <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="headerTasks" (logoutClick)="logout()"></app-header>
 
   <section class="task-form-shell">
-    <h2>{{ taskId ? 'Edit Task' : 'Add Task' }}</h2>
+    <mat-card class="task-card">
+      <mat-card-title>
+        <h2>{{ taskId ? 'Edit Task' : 'Add Task' }}</h2>
+      </mat-card-title>
 
-    <form class="task-form" (ngSubmit)="saveTask()">
-      <div class="field full">
-        <label for="title">Title:</label>
-        <input id="title" [(ngModel)]="task.title" name="title" required />
-      </div>
+      <form class="task-form" (ngSubmit)="saveTask()" #taskForm="ngForm" novalidate>
+        <div class="field full">
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Title</mat-label>
+            <input matInput id="title" name="title" required [(ngModel)]="task.title" #titleCtrl="ngModel" />
+            <mat-error *ngIf="titleCtrl.invalid && titleCtrl.touched">Title is required</mat-error>
+          </mat-form-field>
+        </div>
 
-      <div class="field full">
-        <label for="description">Description:</label>
-        <textarea id="description" [(ngModel)]="task.description" name="description"></textarea>
-      </div>
+        <div class="field full">
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput id="description" name="description" rows="4" [(ngModel)]="task.description"></textarea>
+          </mat-form-field>
+        </div>
 
-      <div class="field">
-        <label for="priority">Priority:</label>
-        <select id="priority" [(ngModel)]="task.priority" name="priority">
-          <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
-        </select>
-      </div>
+        <div class="field">
+          <mat-form-field appearance="fill">
+            <mat-label>Priority</mat-label>
+            <mat-select id="priority" name="priority" [(ngModel)]="task.priority">
+              <mat-option *ngFor="let p of priorities" [value]="p">{{ p }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-      <div class="field">
-        <label for="status">Status:</label>
-        <select id="status" [(ngModel)]="task.status" name="status">
-          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-        </select>
-      </div>
+        <div class="field">
+          <mat-form-field appearance="fill">
+            <mat-label>Status</mat-label>
+            <mat-select id="status" name="status" [(ngModel)]="task.status">
+              <mat-option *ngFor="let s of statuses" [value]="s">{{ s }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-      <div class="field">
-        <label for="deadline">Due Date:</label>
-        <input id="deadline" type="date" [(ngModel)]="task.deadline" name="deadline" />
-      </div>
+        <div class="field">
+          <mat-form-field appearance="fill">
+            <mat-label>Due Date</mat-label>
+            <input matInput [matDatepicker]="picker" id="deadline" name="deadline" required [(ngModel)]="task.deadline"
+              #deadlineCtrl="ngModel" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="deadlineCtrl.invalid && deadlineCtrl.touched">Please select a valid date</mat-error>
+          </mat-form-field>
+        </div>
 
-      <div class="field">
-        <label for="categoryId">Category:</label>
-        <select id="categoryId" [(ngModel)]="task.categoryId" name="categoryId">
-          <option [ngValue]="null">Select category</option>
-          <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
-        </select>
-      </div>
+        <div class="field">
+          <mat-form-field appearance="fill">
+            <mat-label>Category</mat-label>
+            <mat-select id="categoryId" name="categoryId" [(ngModel)]="task.categoryId">
+              <mat-option [value]="null">Select category</mat-option>
+              <mat-option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-      <div class="actions full">
-        <button type="submit" class="save-btn">Save</button>
-        <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
-      </div>
-    </form>
+        <div class="actions full">
+          <button mat-flat-button color="primary" class="save-btn" type="submit"
+            [disabled]="taskForm.invalid">Save</button>
+          <button mat-stroked-button color="accent" type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+        </div>
+      </form>
+    </mat-card>
   </section>
 </div>

@@ -1,31 +1,19 @@
-<!-- English: Material header and table layout; menu and dialogs use Angular Material -->
-<mat-toolbar color="primary" class="header">
-  <span class="title">Task Manager</span>
-  <span class="spacer"></span>
-  <span>Welcome, admin {{ adminName }}</span>
-</mat-toolbar>
-
 <div class="roles">
   <h2>Manage Roles</h2>
 
-  <!-- English: Material table with dataSource and sort (if needed) -->
   <div class="table-wrap">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z2" matSort>
-
-      <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
-        <td mat-cell *matCellDef="let user"> {{ user.name }} </td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+        <td mat-cell *matCellDef="let user">{{ user.name }}</td>
       </ng-container>
 
-      <!-- Role Column -->
       <ng-container matColumnDef="role">
-        <th mat-header-cell *matHeaderCellDef> Role </th>
+        <th mat-header-cell *matHeaderCellDef>Role</th>
         <td mat-cell *matCellDef="let user">
           <div class="role-cell">
             <span>{{ getRoleName(user.roleId) }}</span>
 
-            <!-- English: use mat-menu for per-row actions -->
             <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="setActiveUser(user, $event)"
               aria-label="Open menu">
               <mat-icon>more_vert</mat-icon>
@@ -34,17 +22,14 @@
         </td>
       </ng-container>
 
-      <!-- Header and Row definitions -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="openEditDialog(row)"></tr>
     </table>
   </div>
 
-  <!-- Empty state -->
   <div *ngIf="!users.length" class="empty-state">No users yet</div>
 </div>
 
-<!-- English: shared mat-menu for row actions -->
 <mat-menu #rowMenu="matMenu">
   <button mat-menu-item (click)="openEditDialog(activeUser)">
     <mat-icon>edit</mat-icon>
@@ -56,7 +41,6 @@
   </button>
 </mat-menu>
 
-<!-- English: Edit role dialog template -->
 <ng-template #editDialog let-data>
   <h2 mat-dialog-title>Edit {{ data.name }} role</h2>
   <mat-dialog-content>
@@ -70,7 +54,6 @@
   </mat-dialog-actions>
 </ng-template>
 
-<!-- English: Delete confirmation dialog template -->
 <ng-template #deleteDialog let-data>
   <h2 mat-dialog-title>Confirm delete</h2>
   <mat-dialog-content>

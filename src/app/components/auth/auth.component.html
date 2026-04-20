@@ -1,41 +1,75 @@
+<!-- Material-based auth view: login and registration (view only, no dialogs) -->
+
 <div class="auth-container" [ngClass]="{ 'register-mode': isRegister }">
-  <div class="auth-box">
-    <h2 *ngIf="!isRegister">Authorization</h2>
-    <h2 *ngIf="isRegister">Registration</h2>
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <mat-card-title>
+        <h2 *ngIf="!isRegister">Authorization</h2>
+        <h2 *ngIf="isRegister">Registration</h2>
+      </mat-card-title>
+    </mat-card-header>
 
-    <form *ngIf="!isRegister" (ngSubmit)="login()">
-      <label>Email</label>
-      <input type="email" [(ngModel)]="loginData.email" name="loginEmail" required email />
+    <!-- Login form -->
+    <form *ngIf="!isRegister" (ngSubmit)="login()" class="auth-form" #loginForm="ngForm" novalidate>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" name="loginEmail" required email [(ngModel)]="loginData.email"
+          #loginEmail="ngModel" />
+        <mat-error *ngIf="loginEmail.invalid && loginEmail.touched">Enter a valid email</mat-error>
+      </mat-form-field>
 
-      <label>Password</label>
-      <input type="password" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" />
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" name="loginPassword" required minlength="6" [(ngModel)]="loginData.password"
+          #loginPassword="ngModel" />
+        <mat-error *ngIf="loginPassword.errors?.['required'] && loginPassword.touched">Password is required</mat-error>
+        <mat-error *ngIf="loginPassword.errors?.['minlength'] && loginPassword.touched">Minimum 6 characters</mat-error>
+      </mat-form-field>
 
       <p *ngIf="loginError" class="form-error">{{ loginError }}</p>
 
-      <button type="submit">Log in</button>
+      <button mat-flat-button color="primary" class="action-btn" type="submit" [disabled]="loginForm.invalid">Log
+        in</button>
+
       <p class="switch">Don't have an account?
-        <a (click)="toggleMode()">Register here</a>
+        <a class="link" (click)="toggleMode()">Register here</a>
       </p>
     </form>
 
-    <form *ngIf="isRegister" (ngSubmit)="register()">
-      <label>Name</label>
-      <input type="text" [(ngModel)]="registerData.name" name="registerName" required />
+    <!-- Registration form -->
+    <form *ngIf="isRegister" (ngSubmit)="register()" class="auth-form" #regForm="ngForm" novalidate>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput type="text" name="registerName" required [(ngModel)]="registerData.name" #regName="ngModel" />
+        <mat-error *ngIf="regName.invalid && regName.touched">Name is required</mat-error>
+      </mat-form-field>
 
-      <label>Email</label>
-      <input type="email" [(ngModel)]="registerData.email" name="registerEmail" required email
-        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" />
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" name="registerEmail" required email
+          pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" [(ngModel)]="registerData.email"
+          #regEmail="ngModel" />
+        <mat-error *ngIf="regEmail.invalid && regEmail.touched">Enter a valid email</mat-error>
+      </mat-form-field>
 
-      <label>Password</label>
-      <input type="password" [(ngModel)]="registerData.password" name="registerPassword" required minlength="6"
-        pattern=".*[A-Za-z].*" />
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" name="registerPassword" required minlength="6" pattern=".*[A-Za-z].*"
+          [(ngModel)]="registerData.password" #regPass="ngModel" />
+        <mat-error *ngIf="regPass.errors?.['required'] && regPass.touched">Password is required</mat-error>
+        <mat-error *ngIf="regPass.errors?.['minlength'] && regPass.touched">Minimum 6 characters</mat-error>
+        <mat-error *ngIf="regPass.errors?.['pattern'] && regPass.touched">Must contain at least one Latin
+          letter</mat-error>
+      </mat-form-field>
 
       <p *ngIf="registerError" class="form-error">{{ registerError }}</p>
 
-      <button type="submit">Sign up</button>
+      <button mat-flat-button color="primary" class="action-btn" type="submit" [disabled]="regForm.invalid">Sign
+        up</button>
+
       <p class="switch">Already have an account?
-        <a (click)="toggleMode()">Login here</a>
+        <a class="link" (click)="toggleMode()">Login here</a>
       </p>
     </form>
-  </div>
+  </mat-card>
 </div>

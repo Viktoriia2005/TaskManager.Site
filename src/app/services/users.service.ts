@@ -14,6 +14,11 @@ export interface User {
   };
 }
 
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,6 +41,10 @@ export class UsersService {
 
   updateUser(id: number, user: Partial<User>): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/${id}`, user);
+  }
+
+  changePassword(id: number, payload: ChangePasswordPayload): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}/password`, payload);
   }
 
   deleteUser(id: number): Observable<void> {

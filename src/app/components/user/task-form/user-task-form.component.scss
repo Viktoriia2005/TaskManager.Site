@@ -1,33 +1,61 @@
 @import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
 
-.task-form-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #c7f8cf 0%, #b6f3d5 100%);
+:host {
+  display: block;
   font-family: 'Martel Sans', sans-serif;
 }
 
+/* Top toolbar */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3000;
+}
+
+/* Page layout */
+.task-form-page {
+  padding-top: 64px;
+  /* account for toolbar */
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c7f8cf 0%, #b6f3d5 100%);
+}
+
+/* Shell */
 .task-form-shell {
   max-width: 1100px;
   margin: 0 auto;
   padding: 32px 24px 48px;
 }
 
-h2 {
-  margin: 0 0 28px;
-  text-align: center;
-  font-size: 1.8rem;
+/* Card */
+.task-card {
+  padding: 0;
+  border-radius: 12px;
+  overflow: visible;
 }
 
+/* Title */
+h2 {
+  margin: 0;
+  padding: 20px 24px 0;
+  text-align: center;
+  font-size: 1.8rem;
+  color: #102f3e;
+}
+
+/* Form grid */
 .task-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px 24px;
-  padding: 28px;
+  padding: 24px;
   background: #fff;
-  border-radius: 12px;
-  font-family: 'Martel Sans', sans-serif;
+  border-radius: 0 0 12px 12px;
 }
 
+/* Fields */
 .field {
   display: flex;
   flex-direction: column;
@@ -38,57 +66,34 @@ h2 {
   grid-column: 1 / -1;
 }
 
-label {
-  font-weight: 700;
+.full-width {
+  width: 100%;
 }
 
-input,
-textarea,
-select {
-  padding: 8px 10px;
-  border: 1px solid #8ca0ab;
-  border-radius: 4px;
-  font: inherit;
-  font-size: 0.95rem;
-}
-
-textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
+/* Actions */
 .actions {
   display: flex;
   justify-content: center;
   gap: 18px;
-  margin-top: 14px;
-}
-
-.save-btn,
-.cancel-btn {
-  min-width: 110px;
-  padding: 10px 16px;
-  border-radius: 14px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
+  margin-top: 6px;
 }
 
 .save-btn {
-  border: none;
-  background: #2f5875;
-  color: #fff;
+  min-width: 110px;
 }
 
 .cancel-btn {
-  border: 2px solid #59c6b2;
-  background: #a9f0df;
-  color: #102f3e;
+  min-width: 110px;
 }
 
+/* Responsive */
 @media (max-width: 900px) {
   .task-form {
     grid-template-columns: 1fr;
-    padding: 28px;
+    padding: 20px;
+  }
+
+  .task-form-shell {
+    padding: 20px;
   }
 }

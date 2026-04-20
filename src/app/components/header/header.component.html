@@ -1,14 +1,17 @@
-<header class="header">
-  <h1>Task Manager</h1>
+<mat-toolbar color="primary" class="header-toolbar">
+  <span class="title">Task Manager</span>
+  <span class="spacer"></span>
 
-  <div class="right-menu">
-    <span class="welcome">Welcome, {{ userName }}</span>
+  <span class="welcome">Welcome, {{ userName }}</span>
 
-    <div class="dropdown user-dropdown">
-      <button type="button" class="menu-button icon-button" (click)="toggleUserMenu()">👤</button>
-      <ul *ngIf="showUserMenu" class="menu-list">
-        <li (click)="logout()">Logout</li>
-      </ul>
-    </div>
-  </div>
-</header>
+  <!-- User menu -->
+  <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
+    <mat-icon class="user-icon">account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

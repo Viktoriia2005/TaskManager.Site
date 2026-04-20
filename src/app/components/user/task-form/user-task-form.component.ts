@@ -1,45 +1,67 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { HeaderComponent } from '../../header/header.component';
 import { AuthService } from '../../../services/auth.service';
 import { CategoriesService, Category } from '../../../services/categories.service';
 import { Task, TaskPayload, TasksService } from '../../../services/tasks.service';
 
+/* Angular Material modules */
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+
 @Component({
   selector: 'app-user-task-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HeaderComponent,
+    MatToolbarModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
   templateUrl: './user-task-form.component.html',
-  styleUrl: './user-task-form.component.scss'
+  styleUrls: ['./user-task-form.component.scss']
 })
 export class UserTaskFormComponent implements OnInit {
-  // Task ID (null if creating a new task)
   taskId: number | null = null;
-
-  // Current logged-in user
-  currentUser: ReturnType<AuthService['getCurrentUser']> = null;
-
-  // Tasks for header dropdown
+  currentUser: any = null; // will be set after fetching profile
   headerTasks: { id: number; title: string }[] = [];
-
-  // Available categories
   categories: Category[] = [];
 
-  // Priority and status options
   priorities = ['low', 'medium', 'high'];
   statuses = ['new', 'in_progress', 'done'];
 
-  // Local task object bound to form inputs
-  task = {
-    title: '',
-    description: '',
-    priority: 'medium',
-    status: 'new',
-    deadline: '',
-    categoryId: null as number | null,
-  };
+  // Task model bound to form
+  task: {
+    title: string;
+    description: string;
+    priority: string;
+    status: string;
+    deadline: Date;
+    categoryId: number | null;
+  } = {
+      title: '',
+      description: '',
+      priority: 'medium',
+      status: 'new',
+      deadline: new Date(), // default today
+      categoryId: null
+    };
 
   constructor(
     private route: ActivatedRoute,
@@ -50,26 +72,37 @@ export class UserTaskFormComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Get current user from AuthService
-    this.currentUser = this.authService.getCurrentUser();
+    // Fetch current user profile
+    this.authService.getCurrentUser().subscribe({
+      next: (res) => {
+        this.currentUser = res.user; // FIX: use nested user object
 
-    // Check if editing an existing task (id in route params)
+        // Load tasks for header once user is available
+        this.tasksService.getTasks(this.currentUser.id).subscribe((tasks) => {
+          this.headerTasks = tasks.map(({ id: taskId, title }) => ({ id: taskId, title }));
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load current user:', err);
+        this.currentUser = null;
+
+        // Fallback: load all tasks if no currentUser
+        this.tasksService.getTasks().subscribe((tasks) => {
+          this.headerTasks = tasks.map(({ id: taskId, title }) => ({ id: taskId, title }));
+        });
+      }
+    });
+
+    // Check if editing existing task
     const id = this.route.snapshot.paramMap.get('id');
     this.taskId = id ? Number(id) : null;
 
-    // Load tasks for header menu
-    if (this.currentUser) {
-      this.tasksService.getTasks(this.currentUser.id).subscribe((tasks) => {
-        this.headerTasks = tasks.map(({ id: taskId, title }) => ({ id: taskId, title }));
-      });
-    }
-
-    // Load categories for dropdown
+    // Load categories
     this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
     });
 
-    // If editing, load task data into form
+    // If editing, patch task data
     if (this.taskId) {
       this.tasksService.getTask(this.taskId).subscribe((task) => {
         this.patchTask(task);
@@ -77,57 +110,63 @@ export class UserTaskFormComponent implements OnInit {
     }
   }
 
+  /** Save task (create or update) */
   saveTask(): void {
-    // Redirect to auth if user is not logged in
     if (!this.currentUser) {
       this.router.navigate(['/auth']);
       return;
     }
 
-    // Build payload for backend
+    // Ensure deadline is a Date
+    const deadlineValue: Date = this.task.deadline instanceof Date ? this.task.deadline : new Date(this.task.deadline);
+
     const payload: TaskPayload = {
       title: this.task.title.trim(),
       description: this.task.description || '',
-      priority: this.task.priority, // keep original casing
-      status: this.task.status,     // keep original casing
-      deadline: this.task.deadline
-        ? new Date(this.task.deadline + 'T00:00:00Z') // ✅ ensure full ISO format
-        : new Date(),
-      userId: Number(this.currentUser.id),
-      categoryId: this.task.categoryId ?? null,
+      priority: this.task.priority,
+      status: this.task.status,
+      deadline: deadlineValue,
+      userId: Number(this.currentUser.id), // FIX: now valid
+      categoryId: this.task.categoryId ?? null
     };
 
-    // Decide whether to create or update
     const request = this.taskId
       ? this.tasksService.updateTask(this.taskId, payload)
       : this.tasksService.createTask(payload);
 
-    // After success, redirect to tasks list
-    request.subscribe(() => {
-      this.router.navigate(['/user/tasks']);
+    request.subscribe({
+      next: () => this.router.navigate(['/user/tasks']),
+      error: (err) => console.error('Save task error:', err)
     });
   }
 
+  /** Cancel and go back to tasks */
   cancel(): void {
-    // Navigate back to tasks list
     this.router.navigate(['/user/tasks']);
   }
 
+  /** Logout and redirect to auth */
   logout(): void {
-    // Clear session and redirect to auth
     this.authService.logout();
     this.router.navigate(['/auth']);
   }
 
+  /** Patch task data into form */
   private patchTask(task: Task): void {
-    // Fill form with existing task data
+    let normalizedDeadline: Date = new Date();
+    if (task.deadline) {
+      normalizedDeadline = task.deadline instanceof Date ? task.deadline : new Date(task.deadline);
+      if (isNaN(normalizedDeadline.getTime())) {
+        normalizedDeadline = new Date();
+      }
+    }
     this.task = {
       title: task.title,
       description: task.description ?? '',
       priority: task.priority,
       status: task.status,
-      deadline: task.deadline ? String(task.deadline).slice(0, 10) : '',
-      categoryId: task.categoryId ?? task.category?.id ?? null,
+      deadline: normalizedDeadline,
+      categoryId: task.categoryId ?? task.category?.id ?? null
     };
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { API_BASE_URL } from '../config/api.config';
 export interface Role {
   id: number;
   name: string;
@@ -20,7 +20,7 @@ export interface User {
   providedIn: 'root'
 })
 export class RolesService {
-  private apiUrl = 'http://localhost:3000/roles';
+  private apiUrl = `${API_BASE_URL}/roles`;
 
   constructor(private http: HttpClient) { }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { API_BASE_URL } from '../config/api.config';
 export interface TaskCategory {
   id: number;
   name: string;
@@ -19,7 +19,8 @@ export interface Task {
   title: string;
   description?: string;
   priority: string;
-  deadline: string;
+  // backend may return ISO string or Date; allow both
+  deadline: string | Date;
   status: string;
   userId: number;
   categoryId?: number | null;
@@ -32,7 +33,8 @@ export interface TaskPayload {
   description?: string;
   priority: string;
   status: string;
-  deadline: Date;     // ✅ matches backend DTO
+  // **deadline must be present** and is a Date (not null)
+  deadline: Date;
   userId: number;
   categoryId?: number | null;
 }
@@ -42,12 +44,12 @@ export interface TaskPayload {
   providedIn: 'root'
 })
 export class TasksService {
-  private readonly apiUrl = 'http://localhost:3000/tasks';
+  private readonly apiUrl = `${API_BASE_URL}/tasks`;
 
   constructor(private http: HttpClient) { }
 
   getTasks(userId?: number): Observable<Task[]> {
-    const params = userId ? new HttpParams().set('userId', userId) : undefined;
+    const params = userId ? new HttpParams().set('userId', String(userId)) : undefined;
     return this.http.get<Task[]>(this.apiUrl, { params });
   }
 

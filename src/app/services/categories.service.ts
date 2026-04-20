@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface Category {
   id?: number;
@@ -12,7 +13,7 @@ export interface Category {
   providedIn: 'root'
 })
 export class CategoriesService {
-  private apiUrl = 'http://localhost:3000/categories'; // бекенд Nest.js
+  private apiUrl = `${API_BASE_URL}/categories`; // Nest.js backend
 
   constructor(private http: HttpClient) { }
 

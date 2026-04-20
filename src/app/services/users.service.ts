@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface User {
   id: number;
@@ -17,7 +18,7 @@ export interface User {
   providedIn: 'root'
 })
 export class UsersService {
-  private apiUrl = 'http://localhost:3000/users'; // бекенд Nest.js
+  private apiUrl = `${API_BASE_URL}/users`; // Nest.js backend
 
   constructor(private http: HttpClient) { }
 

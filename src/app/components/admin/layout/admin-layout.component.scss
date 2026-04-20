@@ -1,69 +1,61 @@
 @import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
-$dark-green: #099070;
-$mint: #88FFE3;
-$light-green: #BBFDD6;
-$blue-green: #0AAE87;
-$navy: #2A516A;
-$teal: #53B09B;
 
-.admin-container {
-  display: flex;
-  min-height: 100vh;
+$mint: #88FFE3; // background color for container and content
+$blue-green: #099070; // background color for sidebar
+$sidebar-width: 120px; // sidebar width
+$header-height: 60px; // fixed header height
+
+.admin-sidenav-container {
+  height: 100vh;
   font-family: 'Martel Sans', sans-serif;
+  background: $mint; // overall page background
 }
 
-.sidebar {
-  background: $blue-green;
-  width: 80px;
-  padding: 1rem 0;
-  position: fixed;
+/* Sidebar: fixed block on the left, starts below header, stays behind header */
+.admin-sidenav {
+  // position: fixed;     // if commented, sidebar is not fixed
+  top: $header-height; // offset down by header height
   left: 0;
-  top: 60px; // відступ зверху, щоб не доходила до самого верху
-  height: calc(100vh - 60px); // висота з урахуванням відступу
+  width: $sidebar-width;
+  height: calc(100vh - #{$header-height}); // full viewport height minus header
+  background: $blue-green;
+  color: white;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-
-    li {
-      padding: 1rem 0.5rem;
-      cursor: pointer;
-      text-align: center;
-      font-size: 1rem; // зменшений шрифт
-      transition: background 0.3s, transform 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &:hover {
-        background: $teal;
-        transform: scale(1.05);
-      }
-    }
-  }
-
-  .logout-btn {
-    padding: 1rem 0.5rem;
-    text-align: center;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-bottom: 10px; // невеликий відступ від низу
-
-    &:hover {
-      background: $teal;
-      transform: scale(1.05);
-    }
-  }
+  align-items: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  z-index: 500; // lower than header, so header stays on top
+  margin-top: 60px; // space below header, if sidebar is not fixed
 }
 
+/* Navigation list inside sidebar */
+.compact-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px; // spacing between nav items
+  padding-top: 20px; // top padding inside sidebar
+  padding-bottom: 12px; // bottom padding inside sidebar
+  width: 100%;
+}
+
+/* Main content: shifted right by sidebar width and down by header height */
 .admin-content {
-  flex: 1;
-  margin-left: 80px;
+  margin-left: $sidebar-width; // space for sidebar
+  margin-top: $header-height; // space for header
+  padding: 24px;
+  min-height: calc(100vh - #{$header-height});
   background: $mint;
-  min-height: 100vh;
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 600px) {
+  .admin-sidenav {
+    width: 56px; // narrower sidebar
+  }
+
+  .admin-content {
+    margin-left: 40px; // adjust content margin
+    padding: 16px;
+  }
 }

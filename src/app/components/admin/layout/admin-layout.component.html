@@ -1,7 +1,8 @@
-<!-- English: Material sidenav layout without global topbar -->
+<app-header [userName]="adminName" welcomePrefix="admin " theme="admin"
+  (logoutClick)="logout()"></app-header>
+
 <mat-sidenav-container class="admin-sidenav-container">
-  <!-- Sidenav: fixed on the left, nav items pushed to bottom -->
-  <mat-sidenav #sidenav class="admin-sidenav" mode="side" [opened]="true" fixedInViewport>
+  <mat-sidenav class="admin-sidenav" mode="side" [opened]="true">
     <div class="sidenav-spacer" aria-hidden="true"></div>
 
     <mat-nav-list class="compact-nav">
@@ -29,7 +30,6 @@
     </mat-nav-list>
   </mat-sidenav>
 
-  <!-- Main content -->
   <mat-sidenav-content>
     <div class="admin-content">
       <router-outlet></router-outlet>

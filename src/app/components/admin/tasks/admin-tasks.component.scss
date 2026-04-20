@@ -1,61 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Martel+Sans&display=swap');
 
-$header-height: 60px;
-$mint: #88FFE3;
-$light-green: #BBFDD6;
-$blue-green: #0AAE87;
-$navy: #0AAE87;
+$mint: #88ffe3;
+$light-green: #bbfdd6;
+$blue-green: #0aae87;
 
-/* Header fixed on top */
-mat-toolbar.header,
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: $navy;
-  color: white;
-  height: $header-height;
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  font-family: 'Martel Sans', sans-serif;
-
-  .title {
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  .spacer {
-    flex: 1 1 auto;
-  }
-}
-
-/* Main content below header */
 .tasks {
   background: $mint;
-  padding: 1rem;
-  margin-top: $header-height;
-  min-height: calc(100vh - #{$header-height});
   font-family: 'Martel Sans', sans-serif;
 
   h2 {
     text-align: center;
     margin-top: 0;
+    text-align: center;
     color: black;
     font-size: 1.2rem;
     margin-bottom: 1rem;
   }
 }
 
-/* Table wrapper */
 .table-wrap {
   display: flex;
   justify-content: center;
   padding: 1rem 0;
 }
 
-/* mat-table styling */
 table.mat-table {
   width: 90%;
   background: white;
@@ -64,7 +32,6 @@ table.mat-table {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* header row */
 .mat-header-row {
   background: $light-green;
 }
@@ -76,7 +43,6 @@ table.mat-table {
   border-bottom: 2px solid $blue-green;
 }
 
-/* body cells */
 .mat-row:hover {
   background: #f5f5f5;
 }
@@ -87,7 +53,6 @@ table.mat-table {
   color: #333;
 }
 
-/* small helpers */
 .sort-arrow {
   margin-left: 6px;
   font-size: 0.9rem;
@@ -100,13 +65,8 @@ table.mat-table {
   color: rgba(0, 0, 0, 0.6);
 }
 
-/* Responsive */
 @media (max-width: 900px) {
   table.mat-table {
     width: 100%;
-  }
-
-  .tasks {
-    padding: 0.75rem;
   }
 }

@@ -6,8 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { AuthService } from '../../services/auth.service';
+import {
+  AuthService,
+  ProfileResponse,
+} from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
+import { TranslationService } from '../../i18n/translation.service';
 import {
   ChangePasswordDialogComponent,
   ChangePasswordDialogResult,
@@ -22,13 +27,14 @@ import {
     MatMenuModule,
     MatIconModule,
     MatButtonModule,
+    TranslatePipe,
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent {
-  @Input() userName = 'User';
-  @Input() title = 'Task Manager';
+  @Input() userName = '';
+  @Input() title = '';
   @Input() welcomePrefix = '';
   @Input() theme: 'user' | 'admin' = 'user';
   @Input() tasks: { id: number; title: string }[] = [];
@@ -39,10 +45,15 @@ export class HeaderComponent {
     private readonly usersService: UsersService,
     private readonly dialog: MatDialog,
     private readonly snackBar: MatSnackBar,
+    public readonly translationService: TranslationService,
   ) {}
 
   logout(): void {
     this.logoutClick.emit();
+  }
+
+  get displayUserName(): string {
+    return this.userName || this.translationService.t('common.user');
   }
 
   openChangePasswordDialog(): void {
@@ -50,41 +61,67 @@ export class HeaderComponent {
       width: '420px',
     });
 
-    dialogRef.afterClosed().subscribe((result: ChangePasswordDialogResult | undefined) => {
-      if (!result) {
-        return;
-      }
+    dialogRef
+      .afterClosed()
+      .subscribe((result: ChangePasswordDialogResult | undefined) => {
+        if (!result) {
+          return;
+        }
 
-      this.authService.getCurrentUser().subscribe({
-        next: (res) => {
-          const userId = res?.user?.userId ?? res?.user?.id;
-          if (!userId) {
-            this.snackBar.open('Failed to identify the current user.', 'Close', {
-              duration: 3000,
+        this.authService.getCurrentUser().subscribe({
+          next: (res: ProfileResponse) => {
+            const userId = res.user.userId ?? res.user.id;
+            if (!userId) {
+              this.snackBar.open(
+                this.translationService.t('password.identifyFailed'),
+                this.translationService.t('common.close'),
+                {
+                  duration: 3000,
+                },
+              );
+              return;
+            }
+
+            this.usersService.changePassword(userId, result).subscribe({
+              next: () => {
+                this.snackBar.open(
+                  this.translationService.t('password.changeSuccess'),
+                  this.translationService.t('common.close'),
+                  {
+                    duration: 3000,
+                  },
+                );
+              },
+              error: (err) => {
+                const backendMessage =
+                  typeof err?.error?.message === 'string'
+                    ? this.translationService.translateBackendMessage(
+                        err.error.message,
+                      )
+                    : this.translationService.t('password.changeFailed');
+
+                this.snackBar.open(
+                  backendMessage,
+                  this.translationService.t('common.close'),
+                  { duration: 4000 },
+                );
+              },
             });
-            return;
-          }
-
-          this.usersService.changePassword(userId, result).subscribe({
-            next: () => {
-              this.snackBar.open('Password changed successfully.', 'Close', {
+          },
+          error: () => {
+            this.snackBar.open(
+              this.translationService.t('password.loadUserFailed'),
+              this.translationService.t('common.close'),
+              {
                 duration: 3000,
-              });
-            },
-            error: (err) => {
-              const message =
-                err?.error?.message ||
-                'Failed to change password. Please check your current password.';
-              this.snackBar.open(message, 'Close', { duration: 4000 });
-            },
-          });
-        },
-        error: () => {
-          this.snackBar.open('Failed to load the current user.', 'Close', {
-            duration: 3000,
-          });
-        },
+              },
+            );
+          },
+        });
       });
-    });
+  }
+
+  setLanguage(language: 'uk' | 'en'): void {
+    this.translationService.setLanguage(language);
   }
 }

@@ -6,8 +6,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
 import { HeaderComponent } from '../../header/header.component';
-import { AuthService } from '../../../services/auth.service';
+import {
+  AuthService,
+  ProfileResponse,
+} from '../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -22,6 +26,7 @@ import { AuthService } from '../../../services/auth.service';
     MatIconModule,
     MatButtonModule,
     MatDividerModule,
+    TranslatePipe,
   ],
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
@@ -36,8 +41,8 @@ export class AdminLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.getCurrentUser().subscribe({
-      next: (res) => {
-        this.adminName = res?.user?.name || 'Admin';
+      next: (res: ProfileResponse) => {
+        this.adminName = res.user.name || 'Admin';
       },
       error: (err) => {
         console.error('Failed to load admin name:', err);

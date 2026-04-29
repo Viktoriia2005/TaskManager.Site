@@ -31,11 +31,47 @@
   flex: 1 1 auto;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-right: 12px;
+}
+
 .welcome {
   font-size: 1.2rem;
   font-weight: 600;
-  margin-right: 12px;
   white-space: nowrap;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.lang-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  color: #88ffe3;
+}
+
+.lang-btn {
+  min-width: auto;
+  padding: 0 4px;
+  line-height: 1;
+  color: #fff;
+  font-weight: 700;
+}
+
+.lang-divider {
+  opacity: 0.55;
+  font-weight: 600;
 }
 
 .mat-icon-button {
@@ -58,6 +94,10 @@
 }
 
 @media (max-width: 1200px) {
+  .header-actions {
+    gap: 10px;
+  }
+
   .welcome {
     font-size: 0.95rem;
   }
@@ -72,8 +112,20 @@
     font-size: 1.3rem;
   }
 
+  .header-actions {
+    gap: 8px;
+    margin-right: 8px;
+  }
+
   .welcome {
     font-size: 0.85rem;
-    margin-right: 8px;
+  }
+
+  .lang-switch {
+    padding: 3px 8px;
+  }
+
+  .lang-btn {
+    font-size: 0.8rem;
   }
 }

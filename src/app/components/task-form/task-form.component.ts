@@ -3,7 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
-import { AuthService } from '../../services/auth.service';
+import {
+  AuthService,
+  CurrentUser,
+  ProfileResponse,
+} from '../../services/auth.service';
+import { TranslationService } from '../../i18n/translation.service';
 import { CategoriesService, Category } from '../../services/categories.service';
 import { Task, TaskPayload, TasksService } from '../../services/tasks.service';
 
@@ -37,7 +42,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 })
 export class TaskFormComponent implements OnInit {
   taskId: number | null = null;
-  currentUser: any = null; // English: will be set after fetching profile
+  currentUser: CurrentUser | null = null;
   headerTasks: { id: number; title: string }[] = [];
   categories: Category[] = [];
 
@@ -59,13 +64,14 @@ export class TaskFormComponent implements OnInit {
     private authService: AuthService,
     private categoriesService: CategoriesService,
     private tasksService: TasksService,
+    private translationService: TranslationService,
   ) { }
 
   ngOnInit(): void {
     // English: fetch current user profile
     this.authService.getCurrentUser().subscribe({
-      next: (user) => {
-        this.currentUser = user;
+      next: (res: ProfileResponse) => {
+        this.currentUser = res.user;
 
         // English: load tasks for header once user is available
         this.tasksService.getTasks(this.currentUser.id).subscribe((tasks) => {
@@ -101,15 +107,15 @@ export class TaskFormComponent implements OnInit {
 
     const deadlineValue: Date = this.task.deadline instanceof Date ? this.task.deadline : new Date(this.task.deadline);
 
-    const payload: TaskPayload = {
+    const payload: TaskPayload = this.tasksService.toPayload({
       title: this.task.title,
       description: this.task.description || '',
       priority: this.task.priority,
       status: this.task.status,
-      deadline: deadlineValue, // always Date
+      deadline: deadlineValue,
       userId: this.currentUser.id,
       categoryId: this.task.categoryId,
-    };
+    });
 
     const request = this.taskId
       ? this.tasksService.updateTask(this.taskId, payload)
@@ -148,5 +154,9 @@ export class TaskFormComponent implements OnInit {
       deadline: normalizedDeadline,
       categoryId: task.categoryId ?? task.category?.id ?? null,
     };
+  }
+
+  translateCategory(categoryName: string): string {
+    return this.translationService.translateCategory(categoryName);
   }
 }

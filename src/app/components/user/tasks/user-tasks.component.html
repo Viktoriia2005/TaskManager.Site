@@ -1,139 +1,119 @@
 <!-- Material-based user tasks view -->
 <div class="tasks-page">
-  <!-- Keep existing header component -->
-  <app-header [userName]="currentUser?.name ?? 'User'" [tasks]="tasks" theme="user"
+  <app-header [userName]="currentUser?.name ?? ''" [tasks]="tasks" theme="user"
     (logoutClick)="logout()"></app-header>
 
   <main class="dashboard">
-    <!-- Main page heading -->
-    <h2>Task Dashboard</h2>
+    <h2>{{ 'nav.tasks' | t }}</h2>
 
-    <!-- Toolbar only for Add Task button, placed under heading and above table -->
     <mat-toolbar class="sub-toolbar">
       <span class="spacer"></span>
-      <!-- Stroked button: outlined, no background fill -->
-      <button mat-stroked-button color="primary" (click)="addTask()">
+      <button mat-stroked-button color="primary" type="button" (click)="addTask()">
         <mat-icon>add</mat-icon>
-        Add Task
+        {{ 'task.add' | t }}
       </button>
     </mat-toolbar>
 
-    <!-- Table wrapper -->
     <div class="table-wrap">
-      <!-- Angular Material table displaying tasks -->
       <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
-
-        <!-- Title Column -->
         <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header (click)="sortBy('title')"> Title </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header (click)="sortBy('title')">{{ 'task.title' | t }}</th>
           <td mat-cell *matCellDef="let task"> {{ task.title }} </td>
         </ng-container>
 
-        <!-- Priority Column -->
         <ng-container matColumnDef="priority">
           <th mat-header-cell *matHeaderCellDef>
-            Priority
-            <button mat-icon-button [matMenuTriggerFor]="priorityMenu" aria-label="Priority filter">
+            {{ 'task.priority' | t }}
+            <button mat-icon-button [matMenuTriggerFor]="priorityMenu" [attr.aria-label]="'admin.tasks.priorityFilter' | t">
               <mat-icon>more_vert</mat-icon>
             </button>
           </th>
-          <td mat-cell *matCellDef="let task"> {{ task.priority }} </td>
+          <td mat-cell *matCellDef="let task"> {{ translatePriority(task.priority) }} </td>
         </ng-container>
 
-        <!-- Status Column -->
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>
-            Status
-            <button mat-icon-button [matMenuTriggerFor]="statusMenu" aria-label="Status filter">
+            {{ 'task.status' | t }}
+            <button mat-icon-button [matMenuTriggerFor]="statusMenu" [attr.aria-label]="'admin.tasks.statusFilter' | t">
               <mat-icon>more_vert</mat-icon>
             </button>
           </th>
-          <td mat-cell *matCellDef="let task"> {{ task.status }} </td>
+          <td mat-cell *matCellDef="let task"> {{ translateStatus(task.status) }} </td>
         </ng-container>
 
-        <!-- Deadline Column -->
         <ng-container matColumnDef="deadline">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header (click)="sortBy('deadline')"> Deadline </th>
-          <td mat-cell *matCellDef="let task"> {{ task.deadline | date:'dd MMM yyyy' }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header (click)="sortBy('deadline')">{{ 'task.deadline' | t }}</th>
+          <td mat-cell *matCellDef="let task"> {{ task.deadline | appDate }} </td>
         </ng-container>
 
-        <!-- Category Column -->
         <ng-container matColumnDef="category">
           <th mat-header-cell *matHeaderCellDef>
-            Category
-            <button mat-icon-button [matMenuTriggerFor]="categoryMenu" aria-label="Category filter">
+            {{ 'task.category' | t }}
+            <button mat-icon-button [matMenuTriggerFor]="categoryMenu" [attr.aria-label]="'task.category' | t">
               <mat-icon>more_vert</mat-icon>
             </button>
           </th>
-          <td mat-cell *matCellDef="let task"> {{ task.category?.name ?? 'Uncategorized' }} </td>
+          <td mat-cell *matCellDef="let task"> {{ task.category?.name ? translateCategory(task.category.name) : ('common.uncategorized' | t) }} </td>
         </ng-container>
 
-        <!-- Actions Column -->
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef> </th>
           <td mat-cell *matCellDef="let task">
             <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="setActiveTask(task, $event)"
-              aria-label="Open menu">
+              [attr.aria-label]="'admin.roles.menu' | t">
               <mat-icon>more_vert</mat-icon>
             </button>
           </td>
         </ng-container>
 
-        <!-- Header and row declarations -->
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
-      <!-- Empty state message -->
-      <div *ngIf="!filteredTasks.length" class="empty-state">No tasks found</div>
+      <div *ngIf="!filteredTasks.length" class="empty-state">{{ 'task.empty' | t }}</div>
     </div>
   </main>
 </div>
 
-<!-- Priority filter menu -->
 <mat-menu #priorityMenu="matMenu">
-  <button mat-menu-item (click)="applyFilter('priority', null)">Show all</button>
+  <button mat-menu-item (click)="applyFilter('priority', null)">{{ 'common.showAll' | t }}</button>
   <button mat-menu-item *ngFor="let p of getFilterOptions('priority')" (click)="applyFilter('priority', p)">
-    {{ p }}
+    {{ translatePriority(p) }}
   </button>
 </mat-menu>
 
-<!-- Status filter menu -->
 <mat-menu #statusMenu="matMenu">
-  <button mat-menu-item (click)="applyFilter('status', null)">Show all</button>
+  <button mat-menu-item (click)="applyFilter('status', null)">{{ 'common.showAll' | t }}</button>
   <button mat-menu-item *ngFor="let s of getFilterOptions('status')" (click)="applyFilter('status', s)">
-    {{ s }}
+    {{ translateStatus(s) }}
   </button>
 </mat-menu>
 
-<!-- Category filter menu -->
 <mat-menu #categoryMenu="matMenu">
-  <button mat-menu-item (click)="applyFilter('category', null)">Show all</button>
+  <button mat-menu-item (click)="applyFilter('category', null)">{{ 'common.showAll' | t }}</button>
   <button mat-menu-item *ngFor="let c of getFilterOptions('category')" (click)="applyFilter('category', c)">
-    {{ c }}
+    {{ translateCategory(c) }}
   </button>
 </mat-menu>
 
-<!-- Row context menu -->
 <mat-menu #rowMenu="matMenu">
   <button mat-menu-item (click)="editTask(activeTask)">
     <mat-icon>edit</mat-icon>
-    <span>Edit</span>
+    <span>{{ 'common.edit' | t }}</span>
   </button>
   <button mat-menu-item (click)="openDeleteDialog(activeTask)">
     <mat-icon>delete</mat-icon>
-    <span>Delete</span>
+    <span>{{ 'common.delete' | t }}</span>
   </button>
 </mat-menu>
 
-<!-- Delete confirmation dialog template -->
 <ng-template #deleteDialog let-data>
-  <h2 mat-dialog-title>Confirm delete</h2>
+  <h2 mat-dialog-title>{{ 'admin.roles.deleteTitle' | t }}</h2>
   <mat-dialog-content>
-    Are you sure you want to delete <strong>{{ data?.title }}</strong>?
+    {{ getDeleteMessage(data?.title) }}
   </mat-dialog-content>
   <mat-dialog-actions align="end">
-    <button mat-button (click)="dialogRef?.close()">No</button>
-    <button mat-flat-button color="warn" (click)="deleteTaskConfirmed()">Yes</button>
+    <button mat-button (click)="dialogRef?.close()">{{ 'common.no' | t }}</button>
+    <button mat-flat-button color="warn" (click)="deleteTaskConfirmed()">{{ 'common.yes' | t }}</button>
   </mat-dialog-actions>
 </ng-template>

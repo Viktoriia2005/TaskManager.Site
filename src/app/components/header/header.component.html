@@ -1,21 +1,32 @@
 <mat-toolbar color="primary" class="header-toolbar" [class.admin-theme]="theme === 'admin'"
   [class.user-theme]="theme === 'user'">
-  <span class="title">{{ title }}</span>
+  <span class="title">{{ title || ('app.title' | t) }}</span>
   <span class="spacer"></span>
 
-  <span class="welcome">Welcome, {{ welcomePrefix }}{{ userName }}</span>
+  <div class="header-actions">
+    <div class="lang-switch" aria-label="Language switcher">
+      <mat-icon class="lang-icon">language</mat-icon>
+      <button mat-button type="button" class="lang-btn" (click)="setLanguage('uk')">{{ 'language.uk' | t }}</button>
+      <span class="lang-divider">|</span>
+      <button mat-button type="button" class="lang-btn" (click)="setLanguage('en')">{{ 'language.en' | t }}</button>
+    </div>
 
-  <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
+    <span class="welcome">
+      {{ 'common.welcome' | t }}, {{ welcomePrefix ? (welcomePrefix | t) + ' ' : '' }}{{ displayUserName }}
+    </span>
+  </div>
+
+  <button mat-icon-button [matMenuTriggerFor]="userMenu" [attr.aria-label]="'header.userMenu' | t">
     <mat-icon class="user-icon">account_circle</mat-icon>
   </button>
   <mat-menu #userMenu="matMenu">
     <button mat-menu-item (click)="openChangePasswordDialog()">
       <mat-icon>lock</mat-icon>
-      <span>Change Password</span>
+      <span>{{ 'header.changePassword' | t }}</span>
     </button>
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>
-      <span>Logout</span>
+      <span>{{ 'common.logout' | t }}</span>
     </button>
   </mat-menu>
 </mat-toolbar>

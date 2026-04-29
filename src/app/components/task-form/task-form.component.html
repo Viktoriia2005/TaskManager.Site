@@ -63,7 +63,7 @@
             <mat-label>Category</mat-label>
             <mat-select id="categoryId" name="categoryId" [(ngModel)]="task.categoryId">
               <mat-option [value]="null">Select category</mat-option>
-              <mat-option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</mat-option>
+              <mat-option *ngFor="let c of categories" [value]="c.id">{{ translateCategory(c.name) }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>

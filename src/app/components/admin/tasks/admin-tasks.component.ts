@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { TranslationService } from '../../../i18n/translation.service';
 import { Category, CategoriesService } from '../../../services/categories.service';
 import { Task, TasksService } from '../../../services/tasks.service';
 
@@ -18,6 +20,7 @@ import { Task, TasksService } from '../../../services/tasks.service';
     MatButtonModule,
     MatMenuModule,
     MatSortModule,
+    TranslatePipe,
   ],
   templateUrl: './admin-tasks.component.html',
   styleUrls: ['./admin-tasks.component.scss'],
@@ -37,6 +40,7 @@ export class AdminTasksComponent implements OnInit {
   constructor(
     private readonly tasksService: TasksService,
     private readonly categoriesService: CategoriesService,
+    public readonly translationService: TranslationService,
   ) {}
 
   ngOnInit(): void {
@@ -57,14 +61,16 @@ export class AdminTasksComponent implements OnInit {
         this.filteredTasks = [...data];
         this.dataSource.data = this.filteredTasks;
       },
-      error: (err: any) => console.error('Failed to load tasks:', err),
+      error: (err) =>
+        console.error(this.translationService.t('error.loadTasks'), err),
     });
   }
 
   loadCategories(): void {
     this.categoriesService.getCategories().subscribe({
       next: (data: Category[]) => (this.categories = data),
-      error: (err: any) => console.error('Failed to load categories:', err),
+      error: (err) =>
+        console.error(this.translationService.t('admin.categories.loadFailed'), err),
     });
   }
 
@@ -77,8 +83,8 @@ export class AdminTasksComponent implements OnInit {
     }
 
     this.filteredTasks.sort((a, b) => {
-      const valueA = column === 'user' ? a.user?.name ?? '' : (a as any)[column] ?? '';
-      const valueB = column === 'user' ? b.user?.name ?? '' : (b as any)[column] ?? '';
+      const valueA = this.getSortValue(a, column);
+      const valueB = this.getSortValue(b, column);
 
       return this.sortDirection === 'asc'
         ? valueA.toString().localeCompare(valueB.toString())
@@ -106,5 +112,25 @@ export class AdminTasksComponent implements OnInit {
     if (field === 'priority') return ['low', 'medium', 'high'];
     if (field === 'status') return ['new', 'in_progress', 'done'];
     return [];
+  }
+
+  translatePriority(priority: string): string {
+    return this.translationService.translatePriority(priority);
+  }
+
+  translateStatus(status: string): string {
+    return this.translationService.translateStatus(status);
+  }
+
+  private getSortValue(task: Task, column: string): string {
+    if (column === 'user') {
+      return task.user?.name ?? '';
+    }
+
+    if (column === 'title') {
+      return task.title;
+    }
+
+    return '';
   }
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
+import { formatDateToApi, parseApiDate } from '../shared/date.utils';
 export interface TaskCategory {
   id: number;
   name: string;
@@ -33,8 +34,7 @@ export interface TaskPayload {
   description?: string;
   priority: string;
   status: string;
-  // **deadline must be present** and is a Date (not null)
-  deadline: Date;
+  deadline: string;
   userId: number;
   categoryId?: number | null;
 }
@@ -50,22 +50,44 @@ export class TasksService {
 
   getTasks(userId?: number): Observable<Task[]> {
     const params = userId ? new HttpParams().set('userId', String(userId)) : undefined;
-    return this.http.get<Task[]>(this.apiUrl, { params });
+    return this.http
+      .get<Task[]>(this.apiUrl, { params })
+      .pipe(map((tasks) => tasks.map((task) => this.normalizeTask(task))));
   }
 
   getTask(id: number): Observable<Task> {
-    return this.http.get<Task>(`${this.apiUrl}/${id}`);
+    return this.http
+      .get<Task>(`${this.apiUrl}/${id}`)
+      .pipe(map((task) => this.normalizeTask(task)));
   }
 
   createTask(task: TaskPayload): Observable<Task> {
-    return this.http.post<Task>(this.apiUrl, task);
+    return this.http
+      .post<Task>(this.apiUrl, task)
+      .pipe(map((createdTask) => this.normalizeTask(createdTask)));
   }
 
   updateTask(id: number, task: TaskPayload): Observable<Task> {
-    return this.http.put<Task>(`${this.apiUrl}/${id}`, task);
+    return this.http
+      .put<Task>(`${this.apiUrl}/${id}`, task)
+      .pipe(map((updatedTask) => this.normalizeTask(updatedTask)));
   }
 
   deleteTask(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  toPayload(task: Omit<TaskPayload, 'deadline'> & { deadline: Date }): TaskPayload {
+    return {
+      ...task,
+      deadline: formatDateToApi(task.deadline),
+    };
+  }
+
+  private normalizeTask(task: Task): Task {
+    return {
+      ...task,
+      deadline: parseApiDate(task.deadline),
+    };
   }
 }

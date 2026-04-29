@@ -2,7 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import {
+  AuthService,
+  AuthResponse,
+  ProfileResponse,
+} from '../../services/auth.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
+import { TranslationService } from '../../i18n/translation.service';
 
 /* Angular Material modules used by this component */
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -21,7 +27,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    TranslatePipe,
   ],
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
@@ -35,25 +42,26 @@ export class AuthComponent {
   registerData = { name: '', email: '', password: '' };
 
   constructor(
-    private authService: AuthService,
-    private router: Router,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    public readonly translationService: TranslationService,
   ) { }
 
   /** Toggle between login and register mode */
-  toggleMode() {
+  toggleMode(): void {
     this.isRegister = !this.isRegister;
     this.registerError = '';
     this.loginError = '';
   }
 
-  login() {
+  login(): void {
     this.authService.login(this.loginData.email, this.loginData.password).subscribe({
-      next: (res) => {
+      next: (res: AuthResponse) => {
         this.authService.saveSession(res);
 
         this.authService.getCurrentUser().subscribe({
-          next: (res) => {
-            const user = res?.user;
+          next: (res: ProfileResponse) => {
+            const user = res.user;
             if (user?.roleId === 1) {
               this.router.navigate(['/admin/roles']);
             } else {
@@ -61,23 +69,32 @@ export class AuthComponent {
             }
           },
           error: () => {
-            this.loginError = 'Failed to fetch user profile.';
-          }
+            this.loginError = this.translationService.t('auth.profileFailed');
+          },
         });
       },
-      error: () => {
-        this.loginError = 'Login failed.';
-      }
+      error: (err) => {
+        this.loginError = this.extractErrorMessage(
+          err,
+          this.translationService.t('auth.loginFailed'),
+        );
+      },
     });
   }
 
-  register() {
+  register(): void {
+    const validationMessage = this.validateRegisterForm();
+    if (validationMessage) {
+      this.registerError = validationMessage;
+      return;
+    }
+
     this.authService.register(
       this.registerData.name,
       this.registerData.email,
       this.registerData.password
     ).subscribe({
-      next: (res) => {
+      next: (res: AuthResponse) => {
         this.authService.saveSession(res);
 
         this.authService.getCurrentUser().subscribe({
@@ -85,13 +102,16 @@ export class AuthComponent {
             this.router.navigate(['/user/tasks']);
           },
           error: () => {
-            this.registerError = 'Failed to fetch user profile.';
-          }
+            this.registerError = this.translationService.t('auth.profileFailed');
+          },
         });
       },
-      error: () => {
-        this.registerError = 'Registration failed.';
-      }
+      error: (err) => {
+        this.registerError = this.extractErrorMessage(
+          err,
+          this.translationService.t('auth.registerFailed'),
+        );
+      },
     });
   }
 
@@ -104,36 +124,42 @@ export class AuthComponent {
     const passwordRegex = /[A-Za-z]/;
 
     if (!name) {
-      return 'Name is required.';
+      return this.translationService.t('auth.nameRequired');
     }
 
     if (!strictEmailRegex.test(email)) {
-      return 'Enter a valid email address.';
+      return this.translationService.t('auth.emailAddressInvalid');
     }
 
     if (password.length < 6) {
-      return 'Password must be at least 6 characters.';
+      return this.translationService.t('auth.passwordTooShort');
     }
 
     if (!passwordRegex.test(password)) {
-      return 'Password must contain at least one Latin letter.';
+      return this.translationService.t('auth.passwordLatin');
     }
 
     return '';
   }
 
   /** Extract error message from backend response */
-  private extractErrorMessage(err: any, fallback: string): string {
-    const message = err?.error?.message;
+  private extractErrorMessage(err: unknown, fallback: string): string {
+    const message = (err as { error?: { message?: string | string[] } })?.error?.message;
 
     if (Array.isArray(message)) {
-      return message.join(' ');
+      return message
+        .map((item) => this.translationService.translateBackendMessage(item))
+        .join(' ');
     }
 
     if (typeof message === 'string' && message.trim()) {
-      return message;
+      return this.translationService.translateBackendMessage(message);
     }
 
     return fallback;
+  }
+
+  setLanguage(language: 'uk' | 'en'): void {
+    this.translationService.setLanguage(language);
   }
 }

@@ -4,9 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { HeaderComponent } from '../../header/header.component';
-import { AuthService } from '../../../services/auth.service';
+import {
+  AuthService,
+  CurrentUser,
+  ProfileResponse,
+} from '../../../services/auth.service';
 import { CategoriesService, Category } from '../../../services/categories.service';
 import { Task, TaskPayload, TasksService } from '../../../services/tasks.service';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { TranslationService } from '../../../i18n/translation.service';
 
 /* Angular Material modules */
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -32,14 +38,15 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatSelectModule,
     MatButtonModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    TranslatePipe,
   ],
   templateUrl: './user-task-form.component.html',
   styleUrls: ['./user-task-form.component.scss']
 })
 export class UserTaskFormComponent implements OnInit {
   taskId: number | null = null;
-  currentUser: any = null; // will be set after fetching profile
+  currentUser: CurrentUser | null = null;
   headerTasks: { id: number; title: string }[] = [];
   categories: Category[] = [];
 
@@ -69,40 +76,35 @@ export class UserTaskFormComponent implements OnInit {
     private authService: AuthService,
     private categoriesService: CategoriesService,
     private tasksService: TasksService,
+    public readonly translationService: TranslationService,
   ) { }
 
   ngOnInit(): void {
-    // Fetch current user profile
     this.authService.getCurrentUser().subscribe({
-      next: (res) => {
-        this.currentUser = res.user; // FIX: use nested user object
+      next: (res: ProfileResponse) => {
+        this.currentUser = res.user;
 
-        // Load tasks for header once user is available
         this.tasksService.getTasks(this.currentUser.id).subscribe((tasks) => {
           this.headerTasks = tasks.map(({ id: taskId, title }) => ({ id: taskId, title }));
         });
       },
       error: (err) => {
-        console.error('Failed to load current user:', err);
+        console.error(this.translationService.t('error.loadCurrentUser'), err);
         this.currentUser = null;
 
-        // Fallback: load all tasks if no currentUser
         this.tasksService.getTasks().subscribe((tasks) => {
           this.headerTasks = tasks.map(({ id: taskId, title }) => ({ id: taskId, title }));
         });
       }
     });
 
-    // Check if editing existing task
     const id = this.route.snapshot.paramMap.get('id');
     this.taskId = id ? Number(id) : null;
 
-    // Load categories
     this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
     });
 
-    // If editing, patch task data
     if (this.taskId) {
       this.tasksService.getTask(this.taskId).subscribe((task) => {
         this.patchTask(task);
@@ -117,18 +119,17 @@ export class UserTaskFormComponent implements OnInit {
       return;
     }
 
-    // Ensure deadline is a Date
     const deadlineValue: Date = this.task.deadline instanceof Date ? this.task.deadline : new Date(this.task.deadline);
 
-    const payload: TaskPayload = {
+    const payload: TaskPayload = this.tasksService.toPayload({
       title: this.task.title.trim(),
       description: this.task.description || '',
       priority: this.task.priority,
       status: this.task.status,
       deadline: deadlineValue,
-      userId: Number(this.currentUser.id), // FIX: now valid
+      userId: Number(this.currentUser.id),
       categoryId: this.task.categoryId ?? null
-    };
+    });
 
     const request = this.taskId
       ? this.tasksService.updateTask(this.taskId, payload)
@@ -136,7 +137,7 @@ export class UserTaskFormComponent implements OnInit {
 
     request.subscribe({
       next: () => this.router.navigate(['/user/tasks']),
-      error: (err) => console.error('Save task error:', err)
+      error: (err) => console.error(this.translationService.t('error.saveTask'), err)
     });
   }
 
@@ -168,5 +169,17 @@ export class UserTaskFormComponent implements OnInit {
       deadline: normalizedDeadline,
       categoryId: task.categoryId ?? task.category?.id ?? null
     };
+  }
+
+  translatePriority(priority: string): string {
+    return this.translationService.translatePriority(priority);
+  }
+
+  translateStatus(status: string): string {
+    return this.translationService.translateStatus(status);
+  }
+
+  translateCategory(categoryName: string): string {
+    return this.translationService.translateCategory(categoryName);
   }
 }

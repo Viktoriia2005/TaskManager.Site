@@ -8,6 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { TranslationService } from '../../../i18n/translation.service';
 import { CategoriesService, Category } from '../../../services/categories.service';
 import { CategoryDialogComponent } from './category-dialog.component';
 import { ConfirmDialogComponent } from './confirm-dialog.component';
@@ -25,6 +27,7 @@ import { ConfirmDialogComponent } from './confirm-dialog.component';
     MatDialogModule,
     MatSnackBarModule,
     MatCardModule,
+    TranslatePipe,
   ],
   templateUrl: './admin-categories.component.html',
   styleUrls: ['./admin-categories.component.scss'],
@@ -40,6 +43,7 @@ export class AdminCategoriesComponent implements OnInit {
     private readonly categoriesService: CategoriesService,
     private readonly dialog: MatDialog,
     private readonly snackBar: MatSnackBar,
+    public readonly translationService: TranslationService,
   ) {}
 
   ngOnInit(): void {
@@ -57,8 +61,12 @@ export class AdminCategoriesComponent implements OnInit {
         this.dataSource.data = data;
       },
       error: (err) => {
-        console.error('Failed to load categories:', err);
-        this.snackBar.open('Failed to load categories', 'Close', { duration: 3000 });
+        console.error(this.translationService.t('admin.categories.loadFailed'), err);
+        this.snackBar.open(
+          this.translationService.t('admin.categories.loadFailed'),
+          this.translationService.t('common.close'),
+          { duration: 3000 },
+        );
       },
     });
   }
@@ -66,7 +74,7 @@ export class AdminCategoriesComponent implements OnInit {
   openAddDialog(): void {
     const ref = this.dialog.open(CategoryDialogComponent, {
       width: '420px',
-      data: { title: 'Add new category', category: { name: '', description: '' } },
+      data: { title: this.translationService.t('admin.categories.addDialog'), category: { name: '' } },
     });
 
     ref.afterClosed().subscribe((result: Partial<Category> | undefined) => {
@@ -75,11 +83,19 @@ export class AdminCategoriesComponent implements OnInit {
           next: (newCategory) => {
             this.categories.push(newCategory);
             this.dataSource.data = [...this.categories];
-            this.snackBar.open('Category created', 'Close', { duration: 2000 });
+            this.snackBar.open(
+              this.translationService.t('admin.categories.createSuccess'),
+              this.translationService.t('common.close'),
+              { duration: 2000 },
+            );
           },
           error: (err) => {
-            console.error('Failed to create category:', err);
-            this.snackBar.open('Failed to create category', 'Close', { duration: 3000 });
+            console.error(this.translationService.t('admin.categories.createFailed'), err);
+            this.snackBar.open(
+              this.translationService.t('admin.categories.createFailed'),
+              this.translationService.t('common.close'),
+              { duration: 3000 },
+            );
           },
         });
       }
@@ -89,7 +105,7 @@ export class AdminCategoriesComponent implements OnInit {
   openEditDialog(category: Category): void {
     const ref = this.dialog.open(CategoryDialogComponent, {
       width: '420px',
-      data: { title: 'Edit category', category: { ...category } },
+      data: { title: this.translationService.t('admin.categories.editDialog'), category: { ...category } },
     });
 
     ref.afterClosed().subscribe((result: Partial<Category> | undefined) => {
@@ -101,11 +117,19 @@ export class AdminCategoriesComponent implements OnInit {
               this.categories[idx] = updated;
               this.dataSource.data = [...this.categories];
             }
-            this.snackBar.open('Category updated', 'Close', { duration: 2000 });
+            this.snackBar.open(
+              this.translationService.t('admin.categories.updateSuccess'),
+              this.translationService.t('common.close'),
+              { duration: 2000 },
+            );
           },
           error: (err) => {
-            console.error('Failed to update category:', err);
-            this.snackBar.open('Failed to update category', 'Close', { duration: 3000 });
+            console.error(this.translationService.t('admin.categories.updateFailed'), err);
+            this.snackBar.open(
+              this.translationService.t('admin.categories.updateFailed'),
+              this.translationService.t('common.close'),
+              { duration: 3000 },
+            );
           },
         });
       }
@@ -115,7 +139,11 @@ export class AdminCategoriesComponent implements OnInit {
   openDeleteDialog(category: Category): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '380px',
-      data: { message: `Are you sure you want to delete category "${category.name}"?` },
+      data: {
+        message: this.translationService.t('admin.categories.deleteMessage', {
+          name: category.name,
+        }),
+      },
     });
 
     ref.afterClosed().subscribe((confirmed: boolean | undefined) => {
@@ -124,14 +152,26 @@ export class AdminCategoriesComponent implements OnInit {
           next: () => {
             this.categories = this.categories.filter((item) => item.id !== category.id);
             this.dataSource.data = [...this.categories];
-            this.snackBar.open('Category deleted', 'Close', { duration: 2000 });
+            this.snackBar.open(
+              this.translationService.t('admin.categories.deleteSuccess'),
+              this.translationService.t('common.close'),
+              { duration: 2000 },
+            );
           },
           error: (err) => {
-            console.error('Failed to delete category:', err);
-            this.snackBar.open('Failed to delete category', 'Close', { duration: 3000 });
+            console.error(this.translationService.t('admin.categories.deleteFailed'), err);
+            this.snackBar.open(
+              this.translationService.t('admin.categories.deleteFailed'),
+              this.translationService.t('common.close'),
+              { duration: 3000 },
+            );
           },
         });
       }
     });
+  }
+
+  translateCategory(categoryName: string): string {
+    return this.translationService.translateCategory(categoryName);
   }
 }

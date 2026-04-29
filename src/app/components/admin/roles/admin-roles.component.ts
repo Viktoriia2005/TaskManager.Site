@@ -12,6 +12,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { TranslationService } from '../../../i18n/translation.service';
 import { Role, RolesService, User } from '../../../services/roles.service';
 
 @Component({
@@ -31,6 +33,7 @@ import { Role, RolesService, User } from '../../../services/roles.service';
     MatInputModule,
     MatListModule,
     MatPaginatorModule,
+    TranslatePipe,
   ],
   templateUrl: './admin-roles.component.html',
   styleUrls: ['./admin-roles.component.scss'],
@@ -57,6 +60,7 @@ export class AdminRolesComponent implements OnInit {
   constructor(
     private readonly rolesService: RolesService,
     private readonly dialog: MatDialog,
+    public readonly translationService: TranslationService,
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +77,8 @@ export class AdminRolesComponent implements OnInit {
         this.users = data;
         this.dataSource.data = data;
       },
-      error: (err: any) => console.error('Failed to load users:', err),
+      error: (err) =>
+        console.error(this.translationService.t('error.loadUsers'), err),
     });
   }
 
@@ -106,7 +111,8 @@ export class AdminRolesComponent implements OnInit {
         this.dialogRef?.close();
         this.activeUser = null;
       },
-      error: (err: any) => console.error('Failed to update user role:', err),
+      error: (err) =>
+        console.error(this.translationService.t('error.updateRole'), err),
     });
   }
 
@@ -129,12 +135,19 @@ export class AdminRolesComponent implements OnInit {
         this.dialogRef?.close();
         this.activeUser = null;
       },
-      error: (err: any) => console.error('Failed to delete user:', err),
+      error: (err) =>
+        console.error(this.translationService.t('error.deleteUser'), err),
     });
   }
 
   getRoleName(roleId: number): string {
     const role = this.roles.find((item) => item.id === roleId);
-    return role ? role.name : 'Unknown';
+    return role
+      ? this.translationService.translateRole(role.name)
+      : this.translationService.t('admin.roles.unknown');
+  }
+
+  getRoleLabel(role: Role): string {
+    return this.translationService.translateRole(role.name);
   }
 }

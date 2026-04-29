@@ -3,7 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
-import { AuthService } from '../../services/auth.service';
+import {
+  AuthService,
+  CurrentUser,
+  ProfileResponse,
+} from '../../services/auth.service';
 import { CategoriesService, Category } from '../../services/categories.service';
 import { Task, TasksService } from '../../services/tasks.service';
 
@@ -15,7 +19,7 @@ import { Task, TasksService } from '../../services/tasks.service';
   styleUrls: ['./tasks.component.scss']
 })
 export class TasksComponent implements OnInit {
-  currentUser: any = null; // English: will be set after fetching profile
+  currentUser: CurrentUser | null = null;
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
   categories: Category[] = [];
@@ -45,8 +49,8 @@ export class TasksComponent implements OnInit {
   ngOnInit(): void {
     // English: fetch current user profile
     this.authService.getCurrentUser().subscribe({
-      next: (user) => {
-        this.currentUser = user;
+      next: (res: ProfileResponse) => {
+        this.currentUser = res.user;
         this.loadCategories();
         this.loadTasks();
       },

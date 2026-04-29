@@ -4,7 +4,14 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../header/header.component';
 import { TasksService, Task } from '../../../services/tasks.service';
 import { CategoriesService, Category } from '../../../services/categories.service';
-import { AuthService } from '../../../services/auth.service';
+import {
+  AuthService,
+  CurrentUser,
+  ProfileResponse,
+} from '../../../services/auth.service';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { TranslationService } from '../../../i18n/translation.service';
+import { AppDatePipe } from '../../../shared/app-date.pipe';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
@@ -27,7 +34,9 @@ import { MatTableDataSource } from '@angular/material/table';
     MatButtonModule,
     MatDialogModule,
     MatSortModule,
-    MatToolbarModule
+    MatToolbarModule,
+    TranslatePipe,
+    AppDatePipe,
   ],
   templateUrl: './user-tasks.component.html',
   styleUrls: ['./user-tasks.component.scss']
@@ -39,7 +48,7 @@ export class UserTasksComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   // Current user profile
-  currentUser: any = null;
+  currentUser: CurrentUser | null = null;
   // Tasks data
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
@@ -61,24 +70,22 @@ export class UserTasksComponent implements OnInit {
     private categoriesService: CategoriesService,
     private authService: AuthService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public readonly translationService: TranslationService,
   ) { }
 
   ngOnInit(): void {
-    // Fetch current user profile
     this.authService.getCurrentUser().subscribe({
-      next: (res) => {
-        this.currentUser = res.user; // FIX: use nested user object
+      next: (res: ProfileResponse) => {
+        this.currentUser = res.user;
 
         if (this.currentUser.roleId === 1) {
-          // Admin: load all tasks
           this.tasksService.getTasks().subscribe((tasks) => {
             this.tasks = tasks;
             this.filteredTasks = [...tasks];
             this.dataSource.data = this.filteredTasks;
           });
         } else {
-          // User: load only own tasks
           this.tasksService.getTasks(this.currentUser.id).subscribe((tasks) => {
             this.tasks = tasks;
             this.filteredTasks = [...tasks];
@@ -87,10 +94,9 @@ export class UserTasksComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Failed to load current user:', err);
+        console.error(this.translationService.t('error.loadCurrentUser'), err);
         this.currentUser = null;
 
-        // Fallback: load all tasks if no currentUser
         this.tasksService.getTasks().subscribe((tasks) => {
           this.tasks = tasks;
           this.filteredTasks = [...tasks];
@@ -99,7 +105,6 @@ export class UserTasksComponent implements OnInit {
       }
     });
 
-    // Load categories for filtering
     this.categoriesService.getCategories().subscribe((categories) => {
       this.categories = categories;
     });
@@ -111,7 +116,6 @@ export class UserTasksComponent implements OnInit {
     }
   }
 
-  // Sorting logic
   sortBy(field: string): void {
     if (this.sortField === field) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -120,9 +124,9 @@ export class UserTasksComponent implements OnInit {
       this.sortDirection = 'asc';
     }
 
-    this.filteredTasks.sort((a: any, b: any) => {
-      const valA = (a[field] ?? '').toString().toLowerCase();
-      const valB = (b[field] ?? '').toString().toLowerCase();
+    this.filteredTasks.sort((a, b) => {
+      const valA = this.getSortableValue(a, field);
+      const valB = this.getSortableValue(b, field);
 
       if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
       if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
@@ -132,21 +136,23 @@ export class UserTasksComponent implements OnInit {
     this.dataSource.data = this.filteredTasks;
   }
 
-  // Apply filters
   applyFilter(field: string, value: string | null): void {
     if (!value) {
       this.filteredTasks = [...this.tasks];
     } else {
       if (field === 'category') {
-        this.filteredTasks = this.tasks.filter(t => t.category?.name === value);
+        this.filteredTasks = this.tasks.filter(
+          (task) =>
+            this.translationService.translateCategory(task.category?.name ?? '') ===
+            value,
+        );
       } else {
-        this.filteredTasks = this.tasks.filter(t => (t as any)[field] === value);
+        this.filteredTasks = this.tasks.filter((task) => this.matchesFilter(task, field, value));
       }
     }
     this.dataSource.data = this.filteredTasks;
   }
 
-  // Get filter options
   getFilterOptions(field: string): string[] {
     if (field === 'priority') return ['low', 'medium', 'high'];
     if (field === 'status') return ['new', 'in_progress', 'done'];
@@ -154,7 +160,6 @@ export class UserTasksComponent implements OnInit {
     return [];
   }
 
-  // Navigation actions
   addTask(): void {
     this.router.navigate(['/user/tasks/new']);
   }
@@ -165,13 +170,11 @@ export class UserTasksComponent implements OnInit {
     this.activeTask = null;
   }
 
-  // Row menu helpers
   setActiveTask(task: Task | null, event: MouseEvent): void {
     event.stopPropagation();
     this.activeTask = task;
   }
 
-  // Delete dialog
   openDeleteDialog(task: Task | null): void {
     if (!task) return;
     this.activeTask = task;
@@ -188,15 +191,14 @@ export class UserTasksComponent implements OnInit {
         this.dialogRef?.close();
         this.activeTask = null;
       },
-      error: (err: any) => {
-        console.error('Failed to delete task:', err);
+      error: (err) => {
+        console.error(this.translationService.t('common.delete'), err);
         this.dialogRef?.close();
         this.activeTask = null;
       }
     });
   }
 
-  // Context menu toggle
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
@@ -205,9 +207,48 @@ export class UserTasksComponent implements OnInit {
     }
   }
 
-  // Logout
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth']);
+  }
+
+  translatePriority(priority: string): string {
+    return this.translationService.translatePriority(priority);
+  }
+
+  translateStatus(status: string): string {
+    return this.translationService.translateStatus(status);
+  }
+
+  getDeleteMessage(title: string | undefined): string {
+    return this.translationService.t('task.deleteConfirm', { title: title ?? '' });
+  }
+
+  translateCategory(categoryName: string): string {
+    return this.translationService.translateCategory(categoryName);
+  }
+
+  private getSortableValue(task: Task, field: string): string {
+    const sortableFields: Record<string, string> = {
+      title: task.title,
+      priority: task.priority,
+      status: task.status,
+      deadline: task.deadline instanceof Date ? task.deadline.toISOString() : String(task.deadline),
+      category: this.translationService.translateCategory(task.category?.name ?? ''),
+    };
+
+    return (sortableFields[field] ?? '').toLowerCase();
+  }
+
+  private matchesFilter(task: Task, field: string, value: string): boolean {
+    if (field === 'priority') {
+      return task.priority === value;
+    }
+
+    if (field === 'status') {
+      return task.status === value;
+    }
+
+    return false;
   }
 }

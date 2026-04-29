@@ -5,6 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '../../i18n/translate.pipe';
+import { TranslationService } from '../../i18n/translation.service';
 
 export interface ChangePasswordDialogResult {
   currentPassword: string;
@@ -21,23 +23,24 @@ export interface ChangePasswordDialogResult {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    TranslatePipe,
   ],
   template: `
-    <h2 mat-dialog-title>Change Password</h2>
+    <h2 mat-dialog-title>{{ 'password.title' | t }}</h2>
     <mat-dialog-content>
       <form class="dialog-form">
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Current password</mat-label>
+          <mat-label>{{ 'password.current' | t }}</mat-label>
           <input matInput type="password" [(ngModel)]="currentPassword" name="currentPassword" />
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>New password</mat-label>
+          <mat-label>{{ 'password.new' | t }}</mat-label>
           <input matInput type="password" [(ngModel)]="newPassword" name="newPassword" />
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Confirm new password</mat-label>
+          <mat-label>{{ 'password.confirm' | t }}</mat-label>
           <input matInput type="password" [(ngModel)]="confirmPassword" name="confirmPassword" />
         </mat-form-field>
 
@@ -45,8 +48,8 @@ export interface ChangePasswordDialogResult {
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="dialogRef.close()">Cancel</button>
-      <button mat-flat-button color="primary" (click)="submit()">Save</button>
+      <button mat-button (click)="dialogRef.close()">{{ 'common.cancel' | t }}</button>
+      <button mat-flat-button color="primary" (click)="submit()">{{ 'common.save' | t }}</button>
     </mat-dialog-actions>
   `,
   styles: [`
@@ -80,26 +83,27 @@ export class ChangePasswordDialogComponent {
       ChangePasswordDialogComponent,
       ChangePasswordDialogResult | undefined
     >,
+    private readonly translationService: TranslationService,
   ) {}
 
   submit(): void {
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
-      this.errorMessage = 'All password fields are required.';
+      this.errorMessage = this.translationService.t('password.required');
       return;
     }
 
     if (this.newPassword.length < 6) {
-      this.errorMessage = 'New password must be at least 6 characters long.';
+      this.errorMessage = this.translationService.t('password.minLength');
       return;
     }
 
     if (!/[A-Za-z]/.test(this.newPassword)) {
-      this.errorMessage = 'New password must contain at least one Latin letter.';
+      this.errorMessage = this.translationService.t('password.latin');
       return;
     }
 
     if (this.newPassword !== this.confirmPassword) {
-      this.errorMessage = 'New password confirmation does not match.';
+      this.errorMessage = this.translationService.t('password.mismatch');
       return;
     }
 

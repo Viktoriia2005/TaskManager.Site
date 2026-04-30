@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: "Task Manager/Site"
+        working-directory: TaskManager/Site
 
     steps:
       - name: Checkout
@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: "Task Manager/Site/package-lock.json"
+          cache-dependency-path: TaskManager/Site/package-lock.json
 
       - name: Install dependencies
         run: npm install
@@ -55,7 +55,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "Task Manager/Site/dist/site/browser"
+          path: TaskManager/Site/dist/site/browser
 
   deploy:
     needs: build

@@ -1,0 +1,70 @@
+name: Deploy Site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Site/**'
+      - '.github/workflows/github-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Site
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Site/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build site for GitHub Pages
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npm run build -- --configuration production --base-href "/${REPO_NAME}/"
+
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          cp dist/site/browser/index.html dist/site/browser/404.html
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: Site/dist/site/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

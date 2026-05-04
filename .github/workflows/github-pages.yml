@@ -36,17 +36,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Validate API base URL
-        shell: bash
-        run: |
-          if [ -z "${API_BASE_URL}" ]; then
-            echo "Repository variable API_BASE_URL is required for GitHub Pages deploys."
-            exit 1
-          fi
-
       - name: Inject runtime config
         shell: bash
         run: |
+          if [ -z "${API_BASE_URL}" ]; then
+            echo "API_BASE_URL is not set. Deploy will continue, but API calls will stay disabled until the variable is added."
+          fi
+
           cat <<EOF > public/env.js
           window.__TASK_MANAGER_CONFIG__ = {
             apiBaseUrl: "${API_BASE_URL}",
@@ -59,7 +55,7 @@ jobs:
       - name: Prepare Pages artifact
         shell: bash
         run: |
-          cp dist/site/browser/index.html dist/site/browser/404.html
+          test -f dist/site/browser/404.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

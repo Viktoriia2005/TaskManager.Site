@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 
 export interface AuthResponse {
@@ -31,13 +31,25 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  private ensureApiConfigured(): Observable<never> {
+    return throwError(() => new Error('API_BASE_URL is not configured'));
+  }
+
   /** LOGIN */
   login(email: string, password: string): Observable<AuthResponse> {
+    if (!API_BASE_URL) {
+      return this.ensureApiConfigured();
+    }
+
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password });
   }
 
   /** REGISTER */
   register(name: string, email: string, password: string): Observable<AuthResponse> {
+    if (!API_BASE_URL) {
+      return this.ensureApiConfigured();
+    }
+
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { name, email, password });
   }
 
@@ -65,6 +77,10 @@ export class AuthService {
 
   /** GET CURRENT USER (FIXED) */
   getCurrentUser(): Observable<ProfileResponse> {
+    if (!API_BASE_URL) {
+      return this.ensureApiConfigured();
+    }
+
     const token = this.getToken();
 
     return this.http.get<ProfileResponse>(`${this.apiUrl}/profile`, {

@@ -13,6 +13,7 @@ export interface CurrentUser {
   name: string;
   email: string;
   roleId: number;
+  language?: 'uk' | 'en';
 }
 
 export interface ProfileResponse {

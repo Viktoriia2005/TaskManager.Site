@@ -6,10 +6,14 @@
   <div class="header-actions">
     <div class="lang-switch" aria-label="Language switcher">
       <mat-icon class="lang-icon">language</mat-icon>
-      <button mat-button type="button" class="lang-btn" (click)="setLanguage('uk')">{{ 'language.uk' | t }}</button>
-      <span class="lang-divider">|</span>
-      <button mat-button type="button" class="lang-btn" (click)="setLanguage('en')">{{ 'language.en' | t }}</button>
+
+      <mat-button-toggle-group name="language" [value]="translationService.currentLang"
+        (change)="setLanguage($event.value)" appearance="legacy" class="lang-toggle-group">
+        <mat-button-toggle value="uk">{{ 'language.uk' | t }}</mat-button-toggle>
+        <mat-button-toggle value="en">{{ 'language.en' | t }}</mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
+
 
     <span class="welcome">
       {{ 'common.welcome' | t }}, {{ welcomePrefix ? (welcomePrefix | t) + ' ' : '' }}{{ displayUserName }}

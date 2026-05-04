@@ -21,6 +21,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      API_BASE_URL: ${{ vars.API_BASE_URL }}
 
     steps:
       - name: Checkout
@@ -34,8 +36,25 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Validate API base URL
+        shell: bash
+        run: |
+          if [ -z "${API_BASE_URL}" ]; then
+            echo "Repository variable API_BASE_URL is required for GitHub Pages deploys."
+            exit 1
+          fi
+
+      - name: Inject runtime config
+        shell: bash
+        run: |
+          cat <<EOF > public/env.js
+          window.__TASK_MANAGER_CONFIG__ = {
+            apiBaseUrl: "${API_BASE_URL}",
+          };
+          EOF
+
       - name: Build site for GitHub Pages
-        run: npm run build -- --configuration production --base-href "https://viktoriia2005.github.io/TaskManager.Site/"
+        run: npm run build -- --configuration production --base-href "/TaskManager.Site/"
 
       - name: Prepare Pages artifact
         shell: bash

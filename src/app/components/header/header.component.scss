@@ -61,17 +61,34 @@
   color: #88ffe3;
 }
 
-.lang-btn {
-  min-width: auto;
-  padding: 0 4px;
-  line-height: 1;
-  color: #fff;
-  font-weight: 700;
-}
+.lang-toggle-group {
+  background: transparent;
+  border: none;
 
-.lang-divider {
-  opacity: 0.55;
-  font-weight: 600;
+  ::ng-deep .mat-button-toggle {
+    color: #fff;
+    font-weight: 700;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    &.mat-button-toggle-checked {
+      background-color: #008000;
+      color: #FFA500;
+    }
+
+    .mat-button-toggle-label-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .mat-button-toggle-label-content .mat-button-toggle-icon {
+      display: none !important;
+    }
+  }
 }
 
 .mat-icon-button {

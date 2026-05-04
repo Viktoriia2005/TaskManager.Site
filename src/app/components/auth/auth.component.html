@@ -7,10 +7,7 @@
         <h2 *ngIf="!isRegister">{{ 'auth.loginTitle' | t }}</h2>
         <h2 *ngIf="isRegister">{{ 'auth.registerTitle' | t }}</h2>
       </mat-card-title>
-      <div class="lang-switch">
-        <button mat-button type="button" (click)="setLanguage('uk')">{{ 'language.uk' | t }}</button>
-        <button mat-button type="button" (click)="setLanguage('en')">{{ 'language.en' | t }}</button>
-      </div>
+
     </mat-card-header>
 
     <!-- Login form -->

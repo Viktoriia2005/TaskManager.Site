@@ -119,14 +119,12 @@ export class UserTaskFormComponent implements OnInit {
       return;
     }
 
-    const deadlineValue: Date = this.task.deadline instanceof Date ? this.task.deadline : new Date(this.task.deadline);
-
     const payload: TaskPayload = this.tasksService.toPayload({
       title: this.task.title.trim(),
       description: this.task.description || '',
       priority: this.task.priority,
       status: this.task.status,
-      deadline: deadlineValue,
+      deadline: this.task.deadline instanceof Date ? this.task.deadline : new Date(this.task.deadline),
       userId: Number(this.currentUser.id),
       categoryId: this.task.categoryId ?? null
     });

@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {
   AuthService,
   ProfileResponse,
@@ -27,6 +28,7 @@ import {
     MatMenuModule,
     MatIconModule,
     MatButtonModule,
+    MatButtonToggleModule,
     TranslatePipe,
   ],
   templateUrl: './header.component.html',
@@ -46,7 +48,7 @@ export class HeaderComponent {
     private readonly dialog: MatDialog,
     private readonly snackBar: MatSnackBar,
     public readonly translationService: TranslationService,
-  ) {}
+  ) { }
 
   logout(): void {
     this.logoutClick.emit();
@@ -75,9 +77,7 @@ export class HeaderComponent {
               this.snackBar.open(
                 this.translationService.t('password.identifyFailed'),
                 this.translationService.t('common.close'),
-                {
-                  duration: 3000,
-                },
+                { duration: 3000 },
               );
               return;
             }
@@ -87,17 +87,15 @@ export class HeaderComponent {
                 this.snackBar.open(
                   this.translationService.t('password.changeSuccess'),
                   this.translationService.t('common.close'),
-                  {
-                    duration: 3000,
-                  },
+                  { duration: 3000 },
                 );
               },
               error: (err) => {
                 const backendMessage =
                   typeof err?.error?.message === 'string'
                     ? this.translationService.translateBackendMessage(
-                        err.error.message,
-                      )
+                      err.error.message,
+                    )
                     : this.translationService.t('password.changeFailed');
 
                 this.snackBar.open(
@@ -112,9 +110,7 @@ export class HeaderComponent {
             this.snackBar.open(
               this.translationService.t('password.loadUserFailed'),
               this.translationService.t('common.close'),
-              {
-                duration: 3000,
-              },
+              { duration: 3000 },
             );
           },
         });
@@ -123,5 +119,9 @@ export class HeaderComponent {
 
   setLanguage(language: 'uk' | 'en'): void {
     this.translationService.setLanguage(language);
+  }
+
+  get currentLang(): string {
+    return this.translationService.currentLang;
   }
 }

@@ -1,5 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Language, translations } from './translations';
+import { UsersService } from '../services/users.service';
+import { AuthService, ProfileResponse } from '../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 type TranslationParams = Record<string, string | number>;
 
@@ -10,9 +13,51 @@ export class TranslationService {
 
   readonly language = computed(() => this.languageSignal());
 
-  setLanguage(language: Language): void {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) { }
+
+  get currentLang(): Language {
+    return this.languageSignal();
+  }
+
+  async setLanguage(language: Language): Promise<void> {
     this.languageSignal.set(language);
     localStorage.setItem(this.storageKey, language);
+
+    if (this.authService.isAuthenticated()) {
+      try {
+        const profile: ProfileResponse = await firstValueFrom(
+          this.authService.getCurrentUser(),
+        );
+
+        if (profile?.user?.id) {
+          await firstValueFrom(
+            this.usersService.updateLanguage(profile.user.id, language),
+          );
+        }
+      } catch (err) {
+        console.error('Failed to update language in DB', err);
+      }
+    }
+  }
+
+  async syncLanguageFromDb(): Promise<void> {
+    if (this.authService.isAuthenticated()) {
+      try {
+        const profile: ProfileResponse = await firstValueFrom(
+          this.authService.getCurrentUser(),
+        );
+
+        if (profile?.user?.language) {
+          this.languageSignal.set(profile.user.language as Language);
+          localStorage.setItem(this.storageKey, profile.user.language);
+        }
+      } catch (err) {
+        console.error('Failed to sync language from DB', err);
+      }
+    }
   }
 
   t(key: string, params?: TranslationParams): string {

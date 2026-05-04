@@ -50,4 +50,10 @@ export class UsersService {
   deleteUser(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  updateLanguage(userId: number, language: 'uk' | 'en') {
+    return this.http.patch<void>(`${this.apiUrl}/${userId}/language`, {
+      language,
+    });
+  }
 }

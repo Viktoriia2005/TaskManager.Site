@@ -54,6 +54,7 @@ export class AuthComponent {
     this.loginError = '';
   }
 
+  /** Login user and sync language from DB */
   login(): void {
     this.authService.login(this.loginData.email, this.loginData.password).subscribe({
       next: (res: AuthResponse) => {
@@ -62,6 +63,12 @@ export class AuthComponent {
         this.authService.getCurrentUser().subscribe({
           next: (res: ProfileResponse) => {
             const user = res.user;
+
+            // Sync language from DB if available
+            if (user?.language) {
+              this.translationService.setLanguage(user.language as 'uk' | 'en');
+            }
+
             if (user?.roleId === 1) {
               this.router.navigate(['/admin/roles']);
             } else {
@@ -82,6 +89,7 @@ export class AuthComponent {
     });
   }
 
+  /** Register user and sync language from DB */
   register(): void {
     const validationMessage = this.validateRegisterForm();
     if (validationMessage) {
@@ -98,7 +106,14 @@ export class AuthComponent {
         this.authService.saveSession(res);
 
         this.authService.getCurrentUser().subscribe({
-          next: () => {
+          next: (res: ProfileResponse) => {
+            const user = res.user;
+
+            // Sync language from DB if available
+            if (user?.language) {
+              this.translationService.setLanguage(user.language as 'uk' | 'en');
+            }
+
             this.router.navigate(['/user/tasks']);
           },
           error: () => {
@@ -159,6 +174,7 @@ export class AuthComponent {
     return fallback;
   }
 
+  /** Change language manually */
   setLanguage(language: 'uk' | 'en'): void {
     this.translationService.setLanguage(language);
   }

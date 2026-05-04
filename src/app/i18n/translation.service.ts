@@ -8,8 +8,8 @@ type TranslationParams = Record<string, string | number>;
 
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
-  private readonly storageKey = 'app_language';
-  private readonly languageSignal = signal<Language>(this.getInitialLanguage());
+  private readonly defaultLanguage: Language = 'uk';
+  private readonly languageSignal = signal<Language>(this.defaultLanguage);
 
   readonly language = computed(() => this.languageSignal());
 
@@ -24,7 +24,6 @@ export class TranslationService {
 
   async setLanguage(language: Language): Promise<void> {
     this.languageSignal.set(language);
-    localStorage.setItem(this.storageKey, language);
 
     if (this.authService.isAuthenticated()) {
       try {
@@ -52,7 +51,13 @@ export class TranslationService {
 
         if (profile?.user?.language) {
           this.languageSignal.set(profile.user.language as Language);
-          localStorage.setItem(this.storageKey, profile.user.language);
+          return;
+        }
+
+        if (profile?.user?.id) {
+          await firstValueFrom(
+            this.usersService.updateLanguage(profile.user.id, this.defaultLanguage),
+          );
         }
       } catch (err) {
         console.error('Failed to sync language from DB', err);
@@ -113,12 +118,6 @@ export class TranslationService {
 
     return categoryName;
   }
-
-  private getInitialLanguage(): Language {
-    const savedLanguage = localStorage.getItem(this.storageKey);
-    return savedLanguage === 'en' ? 'en' : 'uk';
-  }
-
   private interpolate(template: string, params?: TranslationParams): string {
     if (!params) {
       return template;

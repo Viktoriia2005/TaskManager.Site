@@ -63,11 +63,7 @@ export class AuthComponent {
         this.authService.getCurrentUser().subscribe({
           next: (res: ProfileResponse) => {
             const user = res.user;
-
-            // Sync language from DB if available
-            if (user?.language) {
-              this.translationService.setLanguage(user.language as 'uk' | 'en');
-            }
+            void this.translationService.syncLanguageFromDb();
 
             if (user?.roleId === 1) {
               this.router.navigate(['/admin/roles']);
@@ -107,12 +103,7 @@ export class AuthComponent {
 
         this.authService.getCurrentUser().subscribe({
           next: (res: ProfileResponse) => {
-            const user = res.user;
-
-            // Sync language from DB if available
-            if (user?.language) {
-              this.translationService.setLanguage(user.language as 'uk' | 'en');
-            }
+            void this.translationService.syncLanguageFromDb();
 
             this.router.navigate(['/user/tasks']);
           },

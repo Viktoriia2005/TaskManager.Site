@@ -151,7 +151,7 @@ export class AuthComponent {
   /** Extract error message from backend response */
   private extractErrorMessage(err: unknown, fallback: string): string {
     if (err instanceof Error && err.message === 'API_BASE_URL is not configured') {
-      return 'API is not configured yet. Add API_BASE_URL in GitHub Pages settings.';
+      return 'API base URL is not configured.';
     }
 
     const message = (err as { error?: { message?: string | string[] } })?.error?.message;

@@ -41,7 +41,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
+                  "with": "src/environments/environment.production.ts"
                 }
               ],
               "budgets": [
@@ -68,6 +68,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "staging": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ],
+              "optimization": true,
+              "extractLicenses": true,
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"
@@ -80,6 +91,9 @@
             },
             "development": {
               "buildTarget": "Site:build:development"
+            },
+            "staging": {
+              "buildTarget": "Site:build:staging"
             }
           },
           "defaultConfiguration": "development"

@@ -21,8 +21,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      API_BASE_URL: ${{ vars.API_BASE_URL }}
+    defaults:
+      run:
+        working-directory: TaskManager/Site
 
     steps:
       - name: Checkout
@@ -32,49 +33,36 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
-      - name: Inject runtime config
-        shell: bash
-        run: |
-          if [ -z "${API_BASE_URL}" ]; then
-            echo "API_BASE_URL is not set. Deploy will continue, but API calls will stay disabled until the variable is added."
-          fi
-
-          cat <<EOF > public/env.js
-          window.__TASK_MANAGER_CONFIG__ = {
-            apiBaseUrl: "${API_BASE_URL}",
-          };
-          EOF
-
       - name: Build site for GitHub Pages
-        run: npm run build -- --configuration production --base-href "/TaskManager.Site/"
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npm run build -- --configuration production --base-href "/${REPO_NAME}/"
 
       - name: Prepare Pages artifact
         shell: bash
         run: |
-          test -f dist/site/browser/404.html
+          cp dist/site/browser/index.html dist/site/browser/404.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist/site/browser 
 
   deploy:
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

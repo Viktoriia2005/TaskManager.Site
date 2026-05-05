@@ -1,0 +1,13 @@
+name: task-manager-site
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: site
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "4201:80"

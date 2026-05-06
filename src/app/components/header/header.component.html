@@ -8,6 +8,7 @@
       <mat-icon class="lang-icon">language</mat-icon>
 
       <mat-button-toggle-group name="language" [value]="translationService.currentLang"
+        [hideSingleSelectionIndicator]="true"
         (change)="setLanguage($event.value)" appearance="legacy" class="lang-toggle-group">
         <mat-button-toggle value="uk">{{ 'language.uk' | t }}</mat-button-toggle>
         <mat-button-toggle value="en">{{ 'language.en' | t }}</mat-button-toggle>
